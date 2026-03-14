@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Auth.RegisterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Регистрация">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="32" Spacing="14">
+
+            <Label Text="Создать аккаунт"
+                   Style="{StaticResource TitleLabel}"
+                   HorizontalOptions="Center"
+                   Margin="0,16,0,16"/>
+
+            <Entry Placeholder="Логин"
+                   Text="{Binding Username}"
+                   PlaceholderColor="{StaticResource ColorSecondary}"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   BackgroundColor="#3D2416" />
+
+            <Entry Placeholder="Email"
+                   Text="{Binding Email}"
+                   PlaceholderColor="{StaticResource ColorSecondary}"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   BackgroundColor="#3D2416"
+                   Keyboard="Email" />
+
+            <Entry Placeholder="Пароль"
+                   Text="{Binding Password}"
+                   PlaceholderColor="{StaticResource ColorSecondary}"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   BackgroundColor="#3D2416"
+                   IsPassword="True" />
+
+            <Entry Placeholder="Подтвердите пароль"
+                   Text="{Binding ConfirmPassword}"
+                   PlaceholderColor="{StaticResource ColorSecondary}"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   BackgroundColor="#3D2416"
+                   IsPassword="True" />
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="#FF6B6B"
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
+
+            <Button Text="Зарегистрироваться"
+                    Command="{Binding RegisterCommand}"
+                    Style="{StaticResource PrimaryButton}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center" />
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                <Label Text="Уже есть аккаунт?"
+                       TextColor="{StaticResource ColorSecondary}" />
+                <Label Text="Войти"
+                       TextColor="{StaticResource ColorAccent}"
+                       TextDecorations="Underline">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

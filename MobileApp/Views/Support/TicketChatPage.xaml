@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="MobileApp.Views.Support.TicketChatPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:MobileApp.Converters"
+    Title="{Binding TicketSubject}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToLayoutOptionsConverter x:Key="BoolToLayoutOptionsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <Frame Grid.Row="0"
+               Margin="16,8,16,4"
+               Padding="8,4"
+               BackgroundColor="#2C1810"
+               BorderColor="{StaticResource ColorBorder}"
+               CornerRadius="8"
+               HorizontalOptions="Center">
+            <Label Text="{Binding TicketStatus, StringFormat='Статус: {0}'}"
+                   TextColor="{StaticResource ColorHighlight}"
+                   FontSize="11" />
+        </Frame>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Messages}"
+                        Margin="12,0"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="4,2">
+                        <Frame BackgroundColor="#3D2416"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="12"
+                               Padding="12,8"
+                               MaximumWidthRequest="260"
+                               HorizontalOptions="{Binding IsFromModerator, Converter={StaticResource BoolToLayoutOptionsConverter}}">
+
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding AuthorUsername}"
+                                       TextColor="{StaticResource ColorHighlight}"
+                                       FontAttributes="Bold"
+                                       FontSize="11" />
+
+                                <Label Text="{Binding Text}"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       FontSize="14" />
+
+                                <Label Text="{Binding CreatedAt, StringFormat='{0:HH:mm}'}"
+                                       TextColor="{StaticResource ColorSecondary}"
+                                       FontSize="10"
+                                       HorizontalOptions="End" />
+                            </VerticalStackLayout>
+
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*, Auto"
+              Padding="16,10"
+              BackgroundColor="#3D2416">
+
+            <Editor Grid.Column="0"
+                    Text="{Binding NewText}"
+                    Placeholder="Написать сообщение..."
+                    PlaceholderColor="{StaticResource ColorSecondary}"
+                    TextColor="{StaticResource ColorTextPrimary}"
+                    BackgroundColor="#2C1810"
+                    AutoSize="TextChanges"
+                    MaximumHeightRequest="120"
+                    VerticalOptions="Center" />
+
+            <Button Grid.Column="1"
+                    Text="➤"
+                    Command="{Binding SendCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    Margin="8,0,0,0"
+                    WidthRequest="48"
+                    HeightRequest="48" />
+        </Grid>
+
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource ColorAccent}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+    </Grid>
+</ContentPage>

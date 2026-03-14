@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Friends.FriendsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Друзья">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="12" Padding="16,8">
+
+            <Button Text="+ Добавить друга"
+                    Command="{Binding SendRequestCommand}"
+                    Style="{StaticResource PrimaryButton}" />
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding HasError}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}" />
+
+            <Label Text="Входящие заявки"
+                   Style="{StaticResource TitleLabel}"
+                   FontSize="18" />
+
+            <CollectionView ItemsSource="{Binding IncomingRequests}">
+                <CollectionView.EmptyView>
+                    <Label Text="Входящих заявок нет"
+                           TextColor="{StaticResource ColorSecondary}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="#3D2416"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="10"
+                               Margin="0,4"
+                               Padding="14">
+                            <VerticalStackLayout Spacing="10">
+                                <Label Text="{Binding SenderUsername}"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       FontAttributes="Bold"
+                                       FontSize="16" />
+
+                                <HorizontalStackLayout Spacing="10">
+                                    <Button Text="Принять"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource PrimaryButton}" />
+
+                                    <Button Text="Отклонить"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource SecondaryButton}" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Список друзей"
+                   Style="{StaticResource TitleLabel}"
+                   FontSize="18"
+                   Margin="0,8,0,0" />
+
+            <CollectionView ItemsSource="{Binding Friends}">
+                <CollectionView.EmptyView>
+                    <Label Text="Друзей пока нет"
+                           TextColor="{StaticResource ColorSecondary}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="#3D2416"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="10"
+                               Margin="0,4"
+                               Padding="14">
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="👤"
+                                       FontSize="24"
+                                       VerticalOptions="Center" />
+
+                                <Label Text="{Binding Username}"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       FontAttributes="Bold"
+                                       FontSize="16"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

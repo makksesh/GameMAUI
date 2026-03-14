@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Profile.ProfilePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Профиль">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <!-- Аватар-заглушка -->
+            <Frame BackgroundColor="#3D2416"
+                   BorderColor="{StaticResource ColorBorder}"
+                   CornerRadius="60"
+                   WidthRequest="120" HeightRequest="120"
+                   HorizontalOptions="Center"
+                   IsClippedToBounds="True">
+                <Label Text="👤" FontSize="64"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Frame>
+
+            <!-- Данные пользователя -->
+            <Frame BackgroundColor="#3D2416"
+                   BorderColor="{StaticResource ColorBorder}"
+                   CornerRadius="10" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Логин: " TextColor="{StaticResource ColorSecondary}" />
+                                <Span Text="{Binding Username}"
+                                      TextColor="{StaticResource ColorTextPrimary}" FontAttributes="Bold" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Email: " TextColor="{StaticResource ColorSecondary}" />
+                                <Span Text="{Binding Email}"
+                                      TextColor="{StaticResource ColorTextPrimary}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Роль: " TextColor="{StaticResource ColorSecondary}" />
+                                <Span Text="{Binding Role}"
+                                      TextColor="{StaticResource ColorAccent}" FontAttributes="Bold" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Кнопки -->
+            <Button Text="Изменить пароль"
+                    Command="{Binding GoToChangePasswordCommand}"
+                    Style="{StaticResource SecondaryButton}" />
+
+            <!-- Только для Admin -->
+            <Button Text="⚙ Панель администратора"
+                    Command="{Binding GoToAdminCommand}"
+                    IsVisible="{Binding IsAdmin}"
+                    BackgroundColor="{StaticResource ColorCurrency}"
+                    TextColor="{StaticResource ColorBackgroundPrimary}"
+                    CornerRadius="8" />
+            
+            <Button Text="Панель модератора"
+                    Command="{Binding GoToModeratorSupportCommand}"
+                    IsVisible="{Binding IsModerator}" />
+
+            <Button Text="Выйти"
+                    Command="{Binding LogoutCommand}"
+                    BackgroundColor="#8B0000"
+                    TextColor="{StaticResource ColorTextPrimary}"
+                    CornerRadius="8"
+                    Margin="0,16,0,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

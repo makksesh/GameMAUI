@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Admin.AdminUsersPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Пользователи">
+
+    <CollectionView ItemsSource="{Binding Users}" Margin="16">
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Frame BackgroundColor="#3D2416"
+                       BorderColor="{StaticResource ColorBorder}"
+                       CornerRadius="10"
+                       Margin="0,4" Padding="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="{Binding Username}"
+                                   TextColor="{StaticResource ColorTextPrimary}"
+                                   FontAttributes="Bold" FontSize="16" />
+                            <Label Text="{Binding Email}"
+                                   TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="{Binding Role}"
+                                       TextColor="{StaticResource ColorAccent}" FontSize="12" />
+                                <Label Text="🔒 Заблокирован"
+                                       TextColor="#FF6B6B" FontSize="11"
+                                       IsVisible="{Binding IsBlocked}" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                            <Button Text="Блок"
+                                    IsVisible="{Binding IsBlocked, Converter={StaticResource InvertBoolConverter}}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.BlockCommand}"
+                                    CommandParameter="{Binding Id}"
+                                    BackgroundColor="#8B0000"
+                                    TextColor="{StaticResource ColorTextPrimary}"
+                                    CornerRadius="6"
+                                    FontSize="11" Padding="10,5" />
+                            <Button Text="Разблок"
+                                    IsVisible="{Binding IsBlocked}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UnblockCommand}"
+                                    CommandParameter="{Binding Id}"
+                                    Style="{StaticResource SecondaryButton}"
+                                    FontSize="11" Padding="10,5" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Frame>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+</ContentPage>

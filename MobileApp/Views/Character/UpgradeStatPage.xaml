@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Character.UpgradeStatPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Улучшение статов">
+
+    <VerticalStackLayout Padding="24" Spacing="16">
+
+        <Label Text="Выберите характеристику"
+               Style="{StaticResource TitleLabel}" />
+
+        <Picker Title="Стат"
+                ItemsSource="{Binding Stats}"
+                SelectedItem="{Binding SelectedStat}"
+                TextColor="{StaticResource ColorTextPrimary}"
+                BackgroundColor="#3D2416"
+                TitleColor="{StaticResource ColorSecondary}" />
+
+        <Label Text="Количество очков"
+               TextColor="{StaticResource ColorSecondary}" />
+
+        <Stepper Minimum="1" Maximum="100"
+                 Value="{Binding Amount}"
+                 Increment="1" />
+
+        <Label TextColor="{StaticResource ColorTextPrimary}">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="Улучшить на: " TextColor="{StaticResource ColorSecondary}" />
+                    <Span Text="{Binding Amount}"
+                          TextColor="{StaticResource ColorAccent}" FontAttributes="Bold" />
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+
+        <Button Text="Применить"
+                Command="{Binding UpgradeCommand}"
+                Style="{StaticResource PrimaryButton}" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource ColorAccent}"
+                           HorizontalOptions="Center" />
+
+        <Label Text="{Binding ErrorMessage}"
+               TextColor="#FF6B6B"
+               IsVisible="{Binding HasError}" />
+
+    </VerticalStackLayout>
+</ContentPage>

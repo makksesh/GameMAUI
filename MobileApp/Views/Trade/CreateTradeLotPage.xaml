@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Trade.CreateTradeLotPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Выставить лот">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+
+            <Label
+                Text="Новый лот"
+                Style="{StaticResource TitleLabel}"
+                HorizontalOptions="Center"
+                Margin="0,0,0,16" />
+
+            <!-- Выбор предмета из инвентаря -->
+            <Label Text="Предмет" Style="{StaticResource CaptionLabel}" />
+            <Picker
+                Title="Выберите предмет"
+                ItemsSource="{Binding InventoryItems}"
+                SelectedItem="{Binding SelectedInventoryItem}"
+                ItemDisplayBinding="{Binding ItemName}"
+                TextColor="{StaticResource ColorTextPrimary}"
+                BackgroundColor="#3D2416"
+                TitleColor="{StaticResource ColorSecondary}" />
+
+            <!-- Количество -->
+            <Label Text="Количество" Style="{StaticResource CaptionLabel}" />
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button
+                    Grid.Column="0"
+                    Text="−"
+                    Command="{Binding DecreaseQuantityCommand}"
+                    BackgroundColor="{StaticResource ColorSurface}"
+                    TextColor="{StaticResource ColorTextPrimary}"
+                    CornerRadius="8"
+                    WidthRequest="44" />
+                <Label
+                    Grid.Column="1"
+                    Text="{Binding NewQuantity}"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    FontSize="18"
+                    FontAttributes="Bold" />
+                <Button
+                    Grid.Column="2"
+                    Text="+"
+                    Command="{Binding IncreaseQuantityCommand}"
+                    BackgroundColor="{StaticResource ColorSurface}"
+                    TextColor="{StaticResource ColorAccent}"
+                    CornerRadius="8"
+                    WidthRequest="44" />
+            </Grid>
+
+            <!-- Цена -->
+            <Label Text="Цена (Gold)" Style="{StaticResource CaptionLabel}" />
+            <Entry
+                Placeholder="Например: 150.00"
+                Text="{Binding NewPriceText}"
+                Keyboard="Numeric"
+                ReturnType="Done" />
+
+            <!-- Ошибка -->
+            <Label
+                Text="{Binding ErrorMessage}"
+                TextColor="#FF6B6B"
+                IsVisible="{Binding HasError}"
+                HorizontalOptions="Center" />
+
+            <!-- Кнопки -->
+            <Button
+                Text="Выставить на продажу"
+                Command="{Binding CreateLotCommand}"
+                Style="{StaticResource PrimaryButton}"
+                Margin="0,8,0,0" />
+
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="{StaticResource ColorAccent}"
+                HorizontalOptions="Center" />
+
+            <Button
+                Text="Отмена"
+                Command="{Binding GoBackCommand}" 
+                Style="{StaticResource SecondaryButton}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

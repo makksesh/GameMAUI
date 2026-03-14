@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Character.CharacterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Персонаж">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <!-- Нет персонажа -->
+            <VerticalStackLayout IsVisible="{Binding HasCharacter, Converter={StaticResource InvertBoolConverter}}"
+                                 Spacing="12">
+                <Label Text="У вас нет персонажа"
+                       Style="{StaticResource TitleLabel}"
+                       HorizontalOptions="Center" />
+                <Button Text="Создать персонажа"
+                        Command="{Binding CreateCommand}"
+                        Style="{StaticResource PrimaryButton}" />
+            </VerticalStackLayout>
+
+            <!-- Карточка персонажа -->
+            <Frame IsVisible="{Binding HasCharacter}"
+                   BackgroundColor="#3D2416"
+                   BorderColor="{StaticResource ColorBorder}"
+                   CornerRadius="12"
+                   Padding="16">
+                <VerticalStackLayout Spacing="8">
+
+                    <Label Text="{Binding Character.Name}"
+                           Style="{StaticResource TitleLabel}"
+                           HorizontalOptions="Center" />
+
+                    <!-- Уровень и опыт -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
+                        <Label TextColor="{StaticResource ColorCurrency}"
+                               FontAttributes="Bold">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Уровень: " TextColor="{StaticResource ColorSecondary}" />
+                                    <Span Text="{Binding Character.Level}"
+                                          TextColor="{StaticResource ColorCurrency}" FontAttributes="Bold" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label>
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Опыт: " TextColor="{StaticResource ColorSecondary}" />
+                                    <Span Text="{Binding Character.Experience}"
+                                          TextColor="{StaticResource ColorTextPrimary}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                    <!-- Разделитель -->
+                    <BoxView HeightRequest="1"
+                             Color="{StaticResource ColorBorder}"
+                             Margin="0,4" />
+
+                    <!-- Статы в сетке -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="8">
+
+                        <!-- HP -->
+                        <Frame Grid.Row="0" Grid.Column="0"
+                               BackgroundColor="#2C1810"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="8" Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="❤ HP" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                                <Label Text="{Binding Character.Health}"
+                                       TextColor="#FF6B6B" FontSize="20" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Mana -->
+                        <Frame Grid.Row="0" Grid.Column="1"
+                               BackgroundColor="#2C1810"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="8" Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="💧 Мана" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                                <Label Text="{Binding Character.Mana}"
+                                       TextColor="#6B9FFF" FontSize="20" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Armor -->
+                        <Frame Grid.Row="1" Grid.Column="0"
+                               BackgroundColor="#2C1810"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="8" Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="🛡 Броня" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                                <Label Text="{Binding Character.Armor}"
+                                       TextColor="{StaticResource ColorHighlight}" FontSize="20" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <!-- Damage -->
+                        <Frame Grid.Row="1" Grid.Column="1"
+                               BackgroundColor="#2C1810"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="8" Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="⚔ Урон" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                                <Label Text="{Binding Character.Damage}"
+                                       TextColor="{StaticResource ColorAccent}" FontSize="20" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Frame>
+
+                    </Grid>
+
+                    <!-- Баланс -->
+                    <Frame BackgroundColor="#2C1810"
+                           BorderColor="{StaticResource ColorCurrency}"
+                           CornerRadius="8" Padding="12">
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                            <Label Text="💰 Баланс:" TextColor="{StaticResource ColorSecondary}" />
+                            <Label Text="{Binding Character.Balance, StringFormat='{0:F2} G'}"
+                                   TextColor="{StaticResource ColorCurrency}"
+                                   FontAttributes="Bold" FontSize="18" />
+                        </HorizontalStackLayout>
+                    </Frame>
+
+                    <Button Text="Улучшить характеристики"
+                            Command="{Binding GoToUpgradeCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            Margin="0,8,0,0" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center" />
+
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="#FF6B6B"
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

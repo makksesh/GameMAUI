@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="MobileApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:auth="clr-namespace:MobileApp.Views.Auth"
+    xmlns:character="clr-namespace:MobileApp.Views.Character"
+    xmlns:skills="clr-namespace:MobileApp.Views.Skills"
+    xmlns:inventory="clr-namespace:MobileApp.Views.Inventory"
+    xmlns:trade="clr-namespace:MobileApp.Views.Trade"
+    xmlns:friends="clr-namespace:MobileApp.Views.Friends"
+    xmlns:support="clr-namespace:MobileApp.Views.Support"
+    xmlns:profile="clr-namespace:MobileApp.Views.Profile">
+
+    <!-- ═══════════════════════════════════
+         СТРАНИЦЫ АВТОРИЗАЦИИ
+    ═══════════════════════════════════ -->
+    <ShellContent
+        x:Name="LoginShell"
+        Route="LoginPage"
+        ContentTemplate="{DataTemplate auth:LoginPage}"
+        Shell.NavBarIsVisible="False" />
+
+    <ShellContent
+        Route="RegisterPage"
+        ContentTemplate="{DataTemplate auth:RegisterPage}"
+        Shell.NavBarIsVisible="False" />
+
+    <!-- ═══════════════════════════════════
+         ОСНОВНОЙ ТАББАР
+    ═══════════════════════════════════ -->
+    <TabBar x:Name="MainTabs" Route="MainTabs">
+
+        <Tab Title="Персонаж" Route="CharacterTab" Icon="icon_character.png">
+            <ShellContent
+                Route="CharacterPage"
+                ContentTemplate="{DataTemplate character:CharacterPage}" />
+        </Tab>
+
+        <Tab Title="Инвентарь" Route="InventoryTab" Icon="icon_inventory.png">
+            <ShellContent
+                Route="InventoryPage"
+                ContentTemplate="{DataTemplate inventory:InventoryPage}" />
+        </Tab>
+
+        <Tab Title="Навыки" Route="SkillsTab" Icon="icon_skills.png">
+            <ShellContent
+                Route="SkillsPage"
+                ContentTemplate="{DataTemplate skills:SkillsPage}" />
+        </Tab>
+
+        <Tab Title="Торговля" Route="TradeTab" Icon="icon_trade.png">
+            <ShellContent
+                Route="TradeLotsPage"
+                ContentTemplate="{DataTemplate trade:TradeLotsPage}" />
+        </Tab>
+
+        <Tab Title="Друзья" Route="FriendsTab" Icon="icon_friends.png">
+            <ShellContent
+                Route="FriendsPage"
+                ContentTemplate="{DataTemplate friends:FriendsPage}" />
+        </Tab>
+
+        <Tab Title="Поддержка" Route="SupportTab" Icon="icon_support.png">
+            <ShellContent
+                Route="SupportPage"
+                ContentTemplate="{DataTemplate support:SupportPage}" />
+        </Tab>
+
+        <Tab Title="Профиль" Route="ProfileTab" Icon="icon_profile.png">
+            <ShellContent
+                Route="ProfilePage"
+                ContentTemplate="{DataTemplate profile:ProfilePage}" />
+        </Tab>
+
+    </TabBar>
+
+</Shell>

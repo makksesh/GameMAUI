@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MobileApp.Views.Support.SupportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Поддержка">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Frame BackgroundColor="#3D2416"
+                   BorderColor="{StaticResource ColorBorder}"
+                   CornerRadius="10"
+                   Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Новый тикет"
+                           Style="{StaticResource TitleLabel}"
+                           FontSize="18" />
+
+                    <Entry Placeholder="Тема"
+                           Text="{Binding NewSubject}"
+                           PlaceholderColor="{StaticResource ColorSecondary}"
+                           TextColor="{StaticResource ColorTextPrimary}"
+                           BackgroundColor="#2C1810" />
+
+                    <Editor Placeholder="Описание проблемы..."
+                            Text="{Binding NewMessage}"
+                            PlaceholderColor="{StaticResource ColorSecondary}"
+                            TextColor="{StaticResource ColorTextPrimary}"
+                            BackgroundColor="#2C1810"
+                            HeightRequest="100" />
+
+                    <Button Text="Отправить"
+                            Command="{Binding CreateCommand}"
+                            Style="{StaticResource PrimaryButton}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Мои тикеты"
+                   Style="{StaticResource TitleLabel}"
+                   FontSize="18" />
+
+            <CollectionView ItemsSource="{Binding Tickets}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="#3D2416"
+                               BorderColor="{StaticResource ColorBorder}"
+                               CornerRadius="10"
+                               Margin="0,4"
+                               Padding="14">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTicketTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <VerticalStackLayout Spacing="6">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding Subject}"
+                                           TextColor="{StaticResource ColorTextPrimary}"
+                                           FontAttributes="Bold"
+                                           FontSize="15" />
+
+                                    <Label Text="{Binding Status}"
+                                           TextColor="{StaticResource ColorHighlight}"
+                                           FontSize="11"
+                                           BackgroundColor="#2C1810"
+                                           Padding="4,2" />
+                                </HorizontalStackLayout>
+
+                                <Label Text="{Binding Message}"
+                                       TextColor="{StaticResource ColorSecondary}"
+                                       FontSize="12"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation" />
+
+                                <HorizontalStackLayout Spacing="8">
+                                    <Button Text="Закрыть"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CloseCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            FontSize="11"
+                                            Padding="8,4" />
+
+                                    <Button Text="Переоткрыть"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ReopenCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            FontSize="11"
+                                            Padding="8,4" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
