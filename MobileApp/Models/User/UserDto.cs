@@ -1,6 +1,6 @@
 using System;
 
-namespace MobileApp.Models.Admin;
+namespace MobileApp.Models.User;
 
 public class UserDto
 {

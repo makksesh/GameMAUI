@@ -1,4 +1,3 @@
-using MobileApp.Services.Api.Admin;
 using MobileApp.Services.Api.Auth;
 using MobileApp.Services.Api.Character;
 using MobileApp.Services.Api.Friends;
@@ -7,19 +6,19 @@ using MobileApp.Services.Api.Skills;
 using MobileApp.Services.Api.Support;
 using MobileApp.Services.Api.Trade;
 using MobileApp.Services.Storage;
-using MobileApp.ViewModels.Admin;
 using MobileApp.ViewModels.Auth;
 using MobileApp.ViewModels.Character;
 using MobileApp.ViewModels.Friends;
+using MobileApp.ViewModels.Home;
 using MobileApp.ViewModels.Inventory;
 using MobileApp.ViewModels.Profile;
 using MobileApp.ViewModels.Skills;
 using MobileApp.ViewModels.Support;
 using MobileApp.ViewModels.Trade;
-using MobileApp.Views.Admin;
 using MobileApp.Views.Auth;
 using MobileApp.Views.Character;
 using MobileApp.Views.Friends;
+using MobileApp.Views.Home;
 using MobileApp.Views.Inventory;
 using MobileApp.Views.Profile;
 using MobileApp.Views.Skills;
@@ -41,7 +40,7 @@ public static class ServiceCollectionExtensions
 #else
             client.BaseAddress = new Uri("http://localhost:7001/api/");
 #endif
-            client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromSeconds(5);
         });
 
         return services;
@@ -63,7 +62,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITradeApiClient,     TradeApiClient>();
         services.AddTransient<IFriendsApiClient,   FriendsApiClient>();
         services.AddTransient<ISupportApiClient,   SupportApiClient>();
-        services.AddTransient<IAdminApiClient,     AdminApiClient>();
         return services;
     }
 
@@ -81,9 +79,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<FriendsViewModel>();
         services.AddTransient<SupportViewModel>();
         services.AddTransient<ProfileViewModel>();
-        services.AddTransient<AdminViewModel>();
-        services.AddTransient<ModeratorSupportViewModel>();
         services.AddTransient<TicketChatViewModel>(); 
+        services.AddTransient<HomeViewModel>();
+        services.AddTransient<BlockedViewModel>();
         return services;
     }
 
@@ -102,8 +100,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<FriendsPage>();
         services.AddTransient<SupportPage>();
         services.AddTransient<ProfilePage>();
-        services.AddTransient<AdminUsersPage>();
         services.AddTransient<TicketChatPage>();
+        services.AddTransient<HomePage>();
+        services.AddTransient<RoleStubPage>();
+        services.AddTransient<BlockedPage>(); 
         return services;
     }
 }

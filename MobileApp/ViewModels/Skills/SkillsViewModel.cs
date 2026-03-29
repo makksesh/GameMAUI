@@ -6,13 +6,39 @@ namespace MobileApp.ViewModels.Skills;
 
 public class SkillsViewModel : BaseViewModel
 {
-    private readonly ISkillsApiClient _skillsApi;
+    private readonly ISkillsApiClient skillsApi;
 
-    public List<SkillDto> AllSkills        { get => _all;  set => SetProperty(ref _all,  value); }
-    public List<CharacterSkillDto> MySkills { get => _mine; set => SetProperty(ref _mine, value); }
+    private List<SkillDto> allSkills = [];
+    public List<SkillDto> AllSkills
+    {
+        get => allSkills;
+        set
+        {
+            if (SetProperty(ref allSkills, value))
+                RebuildGroups();
+        }
+    }
 
-    private List<SkillDto> _all = [];
-    private List<CharacterSkillDto> _mine = [];
+    private List<CharacterSkillDto> mySkills = [];
+    public List<CharacterSkillDto> MySkills
+    {
+        get => mySkills;
+        set
+        {
+            if (SetProperty(ref mySkills, value))
+                RebuildGroups();
+        }
+    }
+
+    private List<SkillDto> unlearnedSkills = [];
+    public List<SkillDto> UnlearnedSkills
+    {
+        get => unlearnedSkills;
+        set => SetProperty(ref unlearnedSkills, value);
+    }
+
+    public bool HasUnlearnedSkills => UnlearnedSkills.Any();
+    public bool HasLearnedSkills => MySkills.Any();
 
     public Command LoadCommand { get; }
     public Command<Guid> LearnCommand { get; }
@@ -20,10 +46,10 @@ public class SkillsViewModel : BaseViewModel
 
     public SkillsViewModel(ISkillsApiClient skillsApi)
     {
-        _skillsApi = skillsApi;
+        this.skillsApi = skillsApi;
 
-        LoadCommand    = new Command(async () => await LoadAsync());
-        LearnCommand   = new Command<Guid>(async id => await LearnAsync(id));
+        LoadCommand = new Command(async () => await LoadAsync());
+        LearnCommand = new Command<Guid>(async id => await LearnAsync(id));
         LevelUpCommand = new Command<Guid>(async id => await LevelUpAsync(id));
     }
 
@@ -31,17 +57,36 @@ public class SkillsViewModel : BaseViewModel
     {
         await RunSafeAsync(async () =>
         {
-            AllSkills = (await _skillsApi.GetAllAsync()) ?? [];
-            MySkills  = (await _skillsApi.GetMyAsync())  ?? [];
+            AllSkills = await skillsApi.GetAllAsync() ?? [];
+            MySkills = await skillsApi.GetMyAsync() ?? [];
+            RebuildGroups();
         });
+    }
+
+    private void RebuildGroups()
+    {
+        var learnedSkillIds = MySkills
+            .Select(x => x.SkillId)
+            .ToHashSet();
+
+        UnlearnedSkills = AllSkills
+            .Where(x => !learnedSkillIds.Contains(x.Id))
+            .ToList();
+
+        OnPropertyChanged(nameof(HasUnlearnedSkills));
+        OnPropertyChanged(nameof(HasLearnedSkills));
     }
 
     private async Task LearnAsync(Guid skillId)
     {
         await RunSafeAsync(async () =>
         {
-            var learned = await _skillsApi.LearnAsync(skillId);
-            if (learned is not null) MySkills = [..MySkills, learned];
+            var learned = await skillsApi.LearnAsync(skillId);
+            if (learned is null)
+                return;
+
+            MySkills = [.. MySkills, learned];
+            RebuildGroups();
         });
     }
 
@@ -49,9 +94,15 @@ public class SkillsViewModel : BaseViewModel
     {
         await RunSafeAsync(async () =>
         {
-            var updated = await _skillsApi.LevelUpAsync(characterSkillId);
-            if (updated is null) return;
-            MySkills = MySkills.Select(s => s.Id == characterSkillId ? updated : s).ToList();
+            var updated = await skillsApi.LevelUpAsync(characterSkillId);
+            if (updated is null)
+                return;
+
+            MySkills = MySkills
+                .Select(s => s.Id == characterSkillId ? updated : s)
+                .ToList();
+
+            RebuildGroups();
         });
     }
 }

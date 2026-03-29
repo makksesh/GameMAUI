@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Home"
+    x:Class="MobileApp.Views.Home.BlockedPage"
+    Shell.NavBarIsVisible="False">
+
+    <VerticalStackLayout
+        VerticalOptions="Center"
+        HorizontalOptions="Center"
+        Spacing="20"
+        Padding="32,0">
+
+        <Label Text="🔒" FontSize="64" HorizontalOptions="Center" />
+
+        <Label
+            Text="Аккаунт заблокирован"
+            Style="{StaticResource TitleLabel}"
+            HorizontalOptions="Center" />
+
+        <!-- Временная блокировка -->
+        <Label
+            Text="{Binding BlockedUntilText}"
+            Style="{StaticResource BodyLabel}"
+            HorizontalOptions="Center"
+            HorizontalTextAlignment="Center" />
+
+        <Button
+            Text="Написать в поддержку"
+            Style="{StaticResource PrimaryButton}"
+            Margin="0,16,0,0"
+            Command="{Binding GoToSupportCommand}" />
+
+        <Button
+            Text="Выйти из аккаунта"
+            Style="{StaticResource SecondaryButton}"
+            Command="{Binding LogoutCommand}" />
+
+    </VerticalStackLayout>
+</ContentPage>

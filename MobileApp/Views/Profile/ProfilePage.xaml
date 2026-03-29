@@ -6,34 +6,25 @@
     Title="Профиль">
 
     <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="16">
+        <VerticalStackLayout Padding="24" Spacing="20">
 
-            <!-- Аватар-заглушка -->
-            <Frame BackgroundColor="#3D2416"
+            <!-- ───── 1. Данные пользователя ───── -->
+            <Frame BackgroundColor="{StaticResource ColorSurface}"
                    BorderColor="{StaticResource ColorBorder}"
-                   CornerRadius="60"
-                   WidthRequest="120" HeightRequest="120"
-                   HorizontalOptions="Center"
-                   IsClippedToBounds="True">
-                <Label Text="👤" FontSize="64"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Frame>
-
-            <!-- Данные пользователя -->
-            <Frame BackgroundColor="#3D2416"
-                   BorderColor="{StaticResource ColorBorder}"
-                   CornerRadius="10" Padding="16">
+                   CornerRadius="12" Padding="16">
                 <VerticalStackLayout Spacing="10">
+
                     <Label>
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span Text="Логин: " TextColor="{StaticResource ColorSecondary}" />
                                 <Span Text="{Binding Username}"
-                                      TextColor="{StaticResource ColorTextPrimary}" FontAttributes="Bold" />
+                                      TextColor="{StaticResource ColorTextPrimary}"
+                                      FontAttributes="Bold" />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
+
                     <Label>
                         <Label.FormattedText>
                             <FormattedString>
@@ -43,22 +34,102 @@
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
+
                     <Label>
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="Роль: " TextColor="{StaticResource ColorSecondary}" />
-                                <Span Text="{Binding Role}"
-                                      TextColor="{StaticResource ColorAccent}" FontAttributes="Bold" />
+                                <Span Text="Пароль: " TextColor="{StaticResource ColorSecondary}" />
+                                <Span Text="••••••••"
+                                      TextColor="{StaticResource ColorTextPrimary}" />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
+
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Кнопки -->
             <Button Text="Изменить пароль"
                     Command="{Binding GoToChangePasswordCommand}"
                     Style="{StaticResource SecondaryButton}" />
+
+            <!-- ───── 2. Громкость музыки ───── -->
+            <Label Text="Громкость музыки"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   FontSize="15" />
+            <Slider Minimum="0" Maximum="1"
+                    Value="{Binding MusicVolume}"
+                    ThumbColor="{StaticResource ColorTextPrimary}"
+                    MinimumTrackColor="{StaticResource ColorTextPrimary}"
+                    MaximumTrackColor="{StaticResource ColorBorder}" />
+
+            <!-- ───── 3. Громкость звуков ───── -->
+            <Label Text="Громкость звуков"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   FontSize="15" />
+            <Slider Minimum="0" Maximum="1"
+                    Value="{Binding SfxVolume}"
+                    ThumbColor="{StaticResource ColorTextPrimary}"
+                    MinimumTrackColor="{StaticResource ColorTextPrimary}"
+                    MaximumTrackColor="{StaticResource ColorBorder}" />
+
+            <!-- ───── 4. Место сохранения ───── -->
+            <Label Text="Место сохранения игровых данных"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   FontSize="15" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="Локально"
+                        Command="{Binding SelectStorageCommand}"
+                        CommandParameter="Local"
+                        BackgroundColor="{Binding LocalButtonColor}"
+                        TextColor="{StaticResource ColorTextPrimary}"
+                        CornerRadius="22"
+                        BorderColor="{StaticResource ColorBorder}"
+                        BorderWidth="1" />
+                <Button Grid.Column="1"
+                        Text="Облако"
+                        Command="{Binding SelectStorageCommand}"
+                        CommandParameter="Cloud"
+                        BackgroundColor="{Binding CloudButtonColor}"
+                        TextColor="{StaticResource ColorTextPrimary}"
+                        CornerRadius="22"
+                        BorderColor="{StaticResource ColorBorder}"
+                        BorderWidth="1" />
+            </Grid>
+
+            <!-- ───── 5. Уведомления ───── -->
+            <Label Text="Уведомления"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   FontSize="15" />
+            <Switch IsToggled="{Binding NotificationsEnabled}"
+                    OnColor="{StaticResource ColorAccent}"
+                    ThumbColor="{StaticResource ColorTextPrimary}"
+                    HorizontalOptions="Start" />
+
+            <!-- ───── Разделитель ───── -->
+            <BoxView HeightRequest="1"
+                     Color="{StaticResource ColorBorder}"
+                     Margin="0,8" />
+
+            <!-- ───── 6. Поддержка и About us ───── -->
+            <Button Text="Поддержка"
+                    Command="{Binding GoToSupportCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    HorizontalOptions="Fill" />
+
+            <Button Text="ABOUT US"
+                    Command="{Binding AboutUsCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    HorizontalOptions="Fill" />
+
+            <!-- ───── Выйти ───── -->
+            <Button Text="Выйти"
+                    Command="{Binding LogoutCommand}"
+                    BackgroundColor="#8B0000"
+                    TextColor="{StaticResource ColorTextPrimary}"
+                    CornerRadius="8"
+                    Margin="0,8,0,0" />
 
             <!-- Только для Admin -->
             <Button Text="⚙ Панель администратора"
@@ -67,17 +138,11 @@
                     BackgroundColor="{StaticResource ColorCurrency}"
                     TextColor="{StaticResource ColorBackgroundPrimary}"
                     CornerRadius="8" />
-            
+
             <Button Text="Панель модератора"
                     Command="{Binding GoToModeratorSupportCommand}"
-                    IsVisible="{Binding IsModerator}" />
-
-            <Button Text="Выйти"
-                    Command="{Binding LogoutCommand}"
-                    BackgroundColor="#8B0000"
-                    TextColor="{StaticResource ColorTextPrimary}"
-                    CornerRadius="8"
-                    Margin="0,16,0,0" />
+                    IsVisible="{Binding IsModerator}"
+                    Style="{StaticResource SecondaryButton}" />
 
         </VerticalStackLayout>
     </ScrollView>

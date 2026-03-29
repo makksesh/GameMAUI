@@ -9,29 +9,19 @@ namespace MobileApp.Views.Skills;
 
 public partial class SkillsPage : ContentPage
 {
-    private readonly SkillsViewModel _viewModel;
+    private readonly SkillsViewModel viewModel;
 
     public SkillsPage(SkillsViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = _viewModel = viewModel;
+        BindingContext = this.viewModel = viewModel;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadAsync();
-    }
 
-    private void ShowAll_Clicked(object sender, EventArgs e)
-    {
-        AllSkillsView.IsVisible = true;
-        MySkillsView.IsVisible  = false;
-    }
-
-    private void ShowMy_Clicked(object sender, EventArgs e)
-    {
-        AllSkillsView.IsVisible = false;
-        MySkillsView.IsVisible  = true;
+        if (viewModel.AllSkills.Count == 0 && viewModel.MySkills.Count == 0)
+            await viewModel.LoadAsync();
     }
 }

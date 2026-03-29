@@ -10,7 +10,7 @@ public abstract class ApiClientBase
     protected readonly HttpClient Http;
     private readonly ITokenStorage _tokenStorage;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    protected static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -79,6 +79,6 @@ public abstract class ApiClientBase
         response.EnsureSuccessStatusCode();
     }
 
-    private static StringContent Serialize(object body) =>
+    protected static StringContent Serialize(object body) =>
         new(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
 }

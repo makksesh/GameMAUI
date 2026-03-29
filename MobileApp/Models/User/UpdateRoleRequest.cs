@@ -1,4 +1,4 @@
-namespace MobileApp.Models.Admin;
+namespace MobileApp.Models.User;
 
 /// <summary>
 /// Роли: "Player" | "Moderator"

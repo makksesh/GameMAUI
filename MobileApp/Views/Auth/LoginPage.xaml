@@ -43,6 +43,14 @@
                 TextColor="#FF6B6B"
                 IsVisible="{Binding HasError}"
                 HorizontalOptions="Center" />
+            
+
+            <ActivityIndicator 
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="{StaticResource ColorAccent}"
+                HorizontalOptions="Center" />
+
 
             <!-- Кнопка входа -->
             <Button

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Home"
+    x:Class="MobileApp.Views.Home.HomePage"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
+        <!-- <Grid.Background> -->
+        <!--     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1"> -->
+        <!--         ~1~ 20% → #0D2231 @1@ -->
+        <!--         <GradientStop Color="#0D2231" Offset="0.20" /> -->
+        <!--         ~1~ 50% → #64226A @1@ -->
+        <!--         <GradientStop Color="#64226A" Offset="0.50" /> -->
+        <!--         ~1~ 100% → #144161 @1@ -->
+        <!--         <GradientStop Color="#144161" Offset="1.0" /> -->
+        <!--     </LinearGradientBrush> -->
+        <!-- </Grid.Background> -->
+
+        <!-- ═══ ВЕРХНЯЯ ПАНЕЛЬ ═══ -->
+        <Grid Grid.Row="0" Padding="16,48,16,8" ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+
+            <!-- Профиль -->
+            <ImageButton
+                Grid.Column="0"
+                Source="icon_profile.png"
+                WidthRequest="36" HeightRequest="36"
+                Margin="0,0,8,0"
+                BackgroundColor="{StaticResource ColorSurface}"
+                CornerRadius="10"
+                Command="{Binding GoToProfileCommand}" />
+
+            <!-- Друзья -->
+            <ImageButton
+                Grid.Column="1"
+                Source="icon_friends.png"
+                WidthRequest="36" HeightRequest="36"
+                Margin="0,0,8,0"
+                BackgroundColor="{StaticResource ColorSurface}"
+                CornerRadius="10"
+                Command="{Binding GoToFriendsCommand}" />
+
+            <!-- Статистика (заглушка) -->
+            <ImageButton
+                Grid.Column="2"
+                Source="icon_stats.png"
+                WidthRequest="36" HeightRequest="36"
+                BackgroundColor="{StaticResource ColorSurface}"
+                CornerRadius="10"
+                IsEnabled="False"
+                Opacity="0.5" />
+
+            <!-- Деньги справа -->
+            <HorizontalStackLayout
+                Grid.Column="4"
+                Spacing="6"
+                VerticalOptions="Center">
+                <Label
+                    Text="{Binding Balance, StringFormat='{0:N0}'}"
+                    TextColor="{StaticResource ColorCurrency}"
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    VerticalOptions="Center" />
+                <Image Source="icon_coin.png" WidthRequest="28" HeightRequest="28" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- ═══ ЦЕНТР ═══ -->
+        <Grid Grid.Row="1">
+
+            <!-- Уведомление о запросе в друзья -->
+            <Frame
+                IsVisible="{Binding HasFriendRequest}"
+                BackgroundColor="{StaticResource ColorSurface}"
+                BorderColor="{StaticResource ColorBorder}"
+                CornerRadius="12"
+                Padding="14,10"
+                Margin="16,12"
+                VerticalOptions="Start"
+                HorizontalOptions="Fill">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label
+                        Grid.Column="0"
+                        Text="{Binding FriendRequestSender, StringFormat='→ Запрос в друзья от {0}'}"
+                        TextColor="{StaticResource ColorTextPrimary}"
+                        FontSize="14"
+                        VerticalOptions="Center" />
+                    <ImageButton
+                        Grid.Column="1"
+                        Source="icon_close.png"
+                        WidthRequest="20" HeightRequest="20"
+                        BackgroundColor="Transparent"
+                        Command="{Binding DismissNotificationCommand}" />
+                </Grid>
+            </Frame>
+
+            <!-- Центральный блок: мышь + геймпады -->
+            <VerticalStackLayout
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Spacing="32">
+
+                <!-- Картинка мыши (декоративная, из Figma) -->
+                <Image
+                    Source="icon_mouse.png"
+                    WidthRequest="120"
+                    HeightRequest="120"
+                    HorizontalOptions="Center" />
+
+                <!-- Два геймпада: одиночный и кооп -->
+                <HorizontalStackLayout
+                    Spacing="40"
+                    HorizontalOptions="Center">
+
+                    <!-- Одиночный режим -->
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <ImageButton
+                            Source="icon_alone.png"
+                            WidthRequest="80" HeightRequest="80"
+                            BackgroundColor="Transparent"
+                            Command="{Binding StartAloneCommand}" />
+                        <Label
+                            Text="Одиночный"
+                            TextColor="White"
+                            FontSize="13"
+                            HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Кооператив -->
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <ImageButton
+                            Source="icon_coop.png"
+                            WidthRequest="80" HeightRequest="80"
+                            BackgroundColor="Transparent"
+                            Command="{Binding StartCoopCommand}" />
+                        <Label
+                            Text="Кооператив"
+                            TextColor="White"
+                            FontSize="13"
+                            HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+        </Grid>
+
+        <!-- ═══ НИЖНЯЯ ПАНЕЛЬ (3 иконки) ═══ -->
+        <Grid
+            Grid.Row="2"
+            ColumnDefinitions="*,*,*"
+            BackgroundColor="{StaticResource ColorSurface}"
+            Padding="8,10,8,28">
+
+            <!-- Навыки -->
+            <VerticalStackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
+                <ImageButton
+                    Source="icon_skills.png"
+                    WidthRequest="44" HeightRequest="44"
+                    BackgroundColor="Transparent"
+                    Command="{Binding GoToSkillsCommand}" />
+                <Label Text="Навыки"
+                       TextColor="{StaticResource ColorTextPrimary}"
+                       FontSize="11"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Магазин -->
+            <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                <ImageButton
+                    Source="icon_trade.png"
+                    WidthRequest="44" HeightRequest="44"
+                    BackgroundColor="Transparent"
+                    Command="{Binding GoToShopCommand}" />
+                <Label Text="Магазин"
+                       TextColor="{StaticResource ColorTextPrimary}"
+                       FontSize="11"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Инвентарь -->
+            <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
+                <ImageButton
+                    Source="icon_inventory.png"
+                    WidthRequest="44" HeightRequest="44"
+                    BackgroundColor="Transparent"
+                    Command="{Binding GoToInventoryCommand}" />
+                <Label Text="Инвентарь"
+                       TextColor="{StaticResource ColorTextPrimary}"
+                       FontSize="11"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+        </Grid>
+    </Grid>
+</ContentPage>

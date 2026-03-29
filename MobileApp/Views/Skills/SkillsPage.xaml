@@ -5,120 +5,171 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Навыки">
 
-    <Grid RowDefinitions="Auto,*">
+    <ScrollView>
+        <VerticalStackLayout Padding="16,8,16,24" Spacing="18">
 
-        <!-- Табы Все / Мои -->
-        <HorizontalStackLayout Grid.Row="0" Spacing="0" Margin="16,8">
-            <Button Text="Все навыки"
-                    BackgroundColor="{StaticResource ColorAccent}"
-                    TextColor="{StaticResource ColorTextPrimary}"
-                    CornerRadius="8"
-                    Clicked="ShowAll_Clicked" />
-            <Button Text="Мои навыки"
-                    BackgroundColor="{StaticResource ColorSecondary}"
-                    TextColor="{StaticResource ColorTextPrimary}"
-                    CornerRadius="8"
-                    Margin="8,0,0,0"
-                    Clicked="ShowMy_Clicked" />
-        </HorizontalStackLayout>
+            <!-- Неизученные -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Неизученные навыки"
+                       TextColor="{StaticResource ColorTextPrimary}"
+                       FontSize="20"
+                       FontAttributes="Bold" />
 
-        <!-- Список всех навыков -->
-        <CollectionView x:Name="AllSkillsView"
-                        Grid.Row="1"
-                        ItemsSource="{Binding AllSkills}"
-                        Margin="16,0">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame BackgroundColor="#3D2416"
-                           BorderColor="{StaticResource ColorBorder}"
-                           CornerRadius="10"
-                           Margin="0,4"
-                           Padding="14">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Label Text="{Binding Name}"
-                                       TextColor="{StaticResource ColorTextPrimary}"
-                                       FontAttributes="Bold" FontSize="16" />
-                                <Label Text="{Binding Description}"
-                                       TextColor="{StaticResource ColorSecondary}"
-                                       FontSize="12" />
-                                <HorizontalStackLayout Spacing="12">
-                                    <Label TextColor="{StaticResource ColorCurrency}">
-                                        <Label.FormattedText>
-                                            <FormattedString>
-                                                <Span Text="Стоимость: " TextColor="{StaticResource ColorSecondary}" FontSize="11" />
-                                                <Span Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
-                                                      TextColor="{StaticResource ColorCurrency}" FontSize="11" />
-                                            </FormattedString>
-                                        </Label.FormattedText>
-                                    </Label>
-                                    <Label TextColor="{StaticResource ColorSecondary}" FontSize="11">
-                                        <Label.FormattedText>
-                                            <FormattedString>
-                                                <Span Text="Макс.уровень: " TextColor="{StaticResource ColorSecondary}" FontSize="11"/>
-                                                <Span Text="{Binding MaxLevel}" TextColor="{StaticResource ColorHighlight}" FontSize="11"/>
-                                            </FormattedString>
-                                        </Label.FormattedText>
-                                    </Label>
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                            <Button Grid.Column="1"
-                                    Text="Изучить"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnCommand}"
-                                    CommandParameter="{Binding Id}"
-                                    Style="{StaticResource PrimaryButton}"
-                                    FontSize="12"
-                                    Padding="10,6" />
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                <Label Text="Сначала навык изучается, после чего он переносится в список изученных."
+                       TextColor="{StaticResource ColorSecondary}"
+                       FontSize="12" />
 
-        <!-- Список моих навыков -->
-        <CollectionView x:Name="MySkillsView"
-                        Grid.Row="1"
-                        ItemsSource="{Binding MySkills}"
-                        IsVisible="False"
-                        Margin="16,0">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame BackgroundColor="#3D2416"
-                           BorderColor="{StaticResource ColorBorder}"
-                           CornerRadius="10"
-                           Margin="0,4"
-                           Padding="14">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Label Text="{Binding SkillName}"
-                                       TextColor="{StaticResource ColorTextPrimary}"
-                                       FontAttributes="Bold" FontSize="16" />
-                                <Label Text="{Binding Description}"
-                                       TextColor="{StaticResource ColorSecondary}"
-                                       FontSize="12" />
-                                <Label>
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Уровень: " TextColor="{StaticResource ColorSecondary}" FontSize="12" />
-                                            <Span Text="{Binding CurrentLevel}" TextColor="{StaticResource ColorAccent}" FontSize="12" FontAttributes="Bold" />
-                                            <Span Text=" / " TextColor="{StaticResource ColorSecondary}" FontSize="12" />
-                                            <Span Text="{Binding MaxLevel}" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                            </VerticalStackLayout>
-                            <Button Grid.Column="1"
-                                    Text="▲ Прокачать"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LevelUpCommand}"
-                                    CommandParameter="{Binding Id}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    FontSize="12"
-                                    Padding="10,6" />
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                <Label Text="Все навыки уже изучены"
+                       IsVisible="{Binding HasUnlearnedSkills, Converter={StaticResource InvertBoolConverter}}"
+                       TextColor="{StaticResource ColorSecondary}"
+                       FontSize="13" />
 
-    </Grid>
+                <CollectionView ItemsSource="{Binding UnlearnedSkills}"
+                                IsVisible="{Binding HasUnlearnedSkills}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BackgroundColor="#3D2416"
+                                   BorderColor="{StaticResource ColorBorder}"
+                                   CornerRadius="10"
+                                   Margin="0,4"
+                                   Padding="14">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                        <Label Text="{Binding Name}"
+                                               TextColor="{StaticResource ColorTextPrimary}"
+                                               FontAttributes="Bold"
+                                               FontSize="16" />
+                                        <Label Text="{Binding Description}"
+                                               TextColor="{StaticResource ColorSecondary}"
+                                               FontSize="12" />
+                                        <HorizontalStackLayout Spacing="12">
+                                            <Label TextColor="{StaticResource ColorCurrency}">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="Стоимость изучения: "
+                                                              TextColor="{StaticResource ColorSecondary}"
+                                                              FontSize="11" />
+                                                        <Span Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
+                                                              TextColor="{StaticResource ColorCurrency}"
+                                                              FontSize="11" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label TextColor="{StaticResource ColorSecondary}"
+                                                   FontSize="11">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="Макс. уровень: "
+                                                              TextColor="{StaticResource ColorSecondary}"
+                                                              FontSize="11" />
+                                                        <Span Text="{Binding MaxLevel}"
+                                                              TextColor="{StaticResource ColorHighlight}"
+                                                              FontSize="11" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Column="1"
+                                            Text="Изучить"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            VerticalOptions="Center" />
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <!-- Изученные -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Изученные навыки"
+                       TextColor="{StaticResource ColorTextPrimary}"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+
+                <Label Text="Изученные навыки можно улучшать дальше, пока не будет достигнут максимальный уровень."
+                       TextColor="{StaticResource ColorSecondary}"
+                       FontSize="12" />
+
+                <Label Text="У вас пока нет изученных навыков"
+                       IsVisible="{Binding HasLearnedSkills, Converter={StaticResource InvertBoolConverter}}"
+                       TextColor="{StaticResource ColorSecondary}"
+                       FontSize="13" />
+
+                <CollectionView ItemsSource="{Binding MySkills}"
+                                IsVisible="{Binding HasLearnedSkills}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BackgroundColor="#3D2416"
+                                   BorderColor="{StaticResource ColorBorder}"
+                                   CornerRadius="10"
+                                   Margin="0,4"
+                                   Padding="14">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                        <Label Text="{Binding SkillName}"
+                                               TextColor="{StaticResource ColorTextPrimary}"
+                                               FontAttributes="Bold"
+                                               FontSize="16" />
+                                        <Label Text="{Binding Description}"
+                                               TextColor="{StaticResource ColorSecondary}"
+                                               FontSize="12" />
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Уровень: "
+                                                          TextColor="{StaticResource ColorSecondary}"
+                                                          FontSize="12" />
+                                                    <Span Text="{Binding CurrentLevel}"
+                                                          TextColor="{StaticResource ColorAccent}"
+                                                          FontSize="12"
+                                                          FontAttributes="Bold" />
+                                                    <Span Text=" / "
+                                                          TextColor="{StaticResource ColorSecondary}"
+                                                          FontSize="12" />
+                                                    <Span Text="{Binding MaxLevel}"
+                                                          TextColor="{StaticResource ColorSecondary}"
+                                                          FontSize="12" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label TextColor="{StaticResource ColorCurrency}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Стоимость улучшения: "
+                                                          TextColor="{StaticResource ColorSecondary}"
+                                                          FontSize="11" />
+                                                    <Span Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
+                                                          TextColor="{StaticResource ColorCurrency}"
+                                                          FontSize="11" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Column="1"
+                                            Text="▲ Прокачать"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LevelUpCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            VerticalOptions="Center" />
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

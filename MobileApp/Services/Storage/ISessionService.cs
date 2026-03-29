@@ -6,8 +6,7 @@ public interface ISessionService
 {
     AuthResponse? CurrentUser { get; }
     bool IsAuthenticated { get; }
-    bool IsAdmin { get; }
-    bool IsModerator { get; }
+    bool IsPlayer { get; }
 
     Task SaveAsync(AuthResponse response);
     Task ClearAsync();

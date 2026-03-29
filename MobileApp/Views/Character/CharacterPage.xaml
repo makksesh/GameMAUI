@@ -1,145 +1,526 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
-    x:Class="MobileApp.Views.Character.CharacterPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Character"
+    xmlns:inv="clr-namespace:MobileApp.Models.Inventory"
+    x:Class="MobileApp.Views.Character.CharacterPage"
+    x:DataType="vm:CharacterViewModel"
     Title="Персонаж">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="12">
+    <ContentPage.Resources>
 
-            <!-- Нет персонажа -->
-            <VerticalStackLayout IsVisible="{Binding HasCharacter, Converter={StaticResource InvertBoolConverter}}"
-                                 Spacing="12">
+        <!-- Стиль слота экипировки -->
+        <Style x:Key="SlotBorder" TargetType="Border">
+            <Setter Property="BackgroundColor"   Value="{StaticResource ColorSurface}" />
+            <Setter Property="Stroke"            Value="{StaticResource ColorBorder}" />
+            <Setter Property="StrokeShape"       Value="RoundRectangle 8" />
+            <Setter Property="Padding"           Value="6" />
+            <Setter Property="WidthRequest"      Value="82" />
+            <Setter Property="HeightRequest"     Value="82" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+
+        <!-- Стиль ячейки инвентаря -->
+        <Style x:Key="InventoryFrame" TargetType="Border">
+            <Setter Property="BackgroundColor"   Value="{StaticResource ColorSurface}" />
+            <Setter Property="Stroke"            Value="{StaticResource ColorBorder}" />
+            <Setter Property="StrokeShape"       Value="RoundRectangle 8" />
+            <Setter Property="Padding"           Value="6" />
+            <Setter Property="Margin"            Value="4" />
+            <Setter Property="WidthRequest"      Value="100" />
+            <Setter Property="HeightRequest"     Value="100" />
+        </Style>
+
+        <!-- Метка названия слота -->
+        <Style x:Key="SlotCaption" TargetType="Label">
+            <Setter Property="FontSize"          Value="10" />
+            <Setter Property="TextColor"         Value="{StaticResource ColorSecondary}" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="Margin"            Value="0,2,0,0" />
+        </Style>
+
+        <!-- Метка редкости -->
+        <Style x:Key="RarityLabel" TargetType="Label">
+            <Setter Property="FontSize"          Value="9" />
+            <Setter Property="TextColor"         Value="{StaticResource ColorHighlight}" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+
+        <!-- Заголовок секции -->
+        <Style x:Key="SectionTitle" TargetType="Label">
+            <Setter Property="FontSize"          Value="15" />
+            <Setter Property="FontAttributes"    Value="Bold" />
+            <Setter Property="TextColor"         Value="{StaticResource ColorTextPrimary}" />
+            <Setter Property="Margin"            Value="0,12,0,4" />
+        </Style>
+
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="14" Spacing="0">
+
+            <!-- ══════════════════════════════
+                 НЕТ ПЕРСОНАЖА
+            ══════════════════════════════ -->
+            <VerticalStackLayout
+                IsVisible="{Binding HasCharacter, Converter={StaticResource InvertBoolConverter}}"
+                Spacing="16"
+                Padding="24"
+                VerticalOptions="Center">
+
                 <Label Text="У вас нет персонажа"
                        Style="{StaticResource TitleLabel}"
                        HorizontalOptions="Center" />
-                <Button Text="Создать персонажа"
+
+                <Button Text="⚔ Создать персонажа"
                         Command="{Binding CreateCommand}"
-                        Style="{StaticResource PrimaryButton}" />
+                        Style="{StaticResource PrimaryButton}"
+                        HorizontalOptions="Center" />
             </VerticalStackLayout>
 
-            <!-- Карточка персонажа -->
-            <Frame IsVisible="{Binding HasCharacter}"
-                   BackgroundColor="#3D2416"
-                   BorderColor="{StaticResource ColorBorder}"
-                   CornerRadius="12"
-                   Padding="16">
-                <VerticalStackLayout Spacing="8">
+            <!-- ══════════════════════════════
+                 ОСНОВНОЙ КОНТЕНТ
+            ══════════════════════════════ -->
+            <VerticalStackLayout
+                IsVisible="{Binding HasCharacter}"
+                Spacing="0">
 
-                    <Label Text="{Binding Character.Name}"
-                           Style="{StaticResource TitleLabel}"
-                           HorizontalOptions="Center" />
+                <!-- ── Заголовок: имя + золото ── -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
 
-                    <!-- Уровень и опыт -->
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
-                        <Label TextColor="{StaticResource ColorCurrency}"
-                               FontAttributes="Bold">
+                    <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                        <Label Text="{Binding Character.Name}"
+                               Style="{StaticResource TitleLabel}" />
+                        <Label Style="{StaticResource CaptionLabel}">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="Уровень: " TextColor="{StaticResource ColorSecondary}" />
+                                    <Span Text="Уровень " />
                                     <Span Text="{Binding Character.Level}"
-                                          TextColor="{StaticResource ColorCurrency}" FontAttributes="Bold" />
+                                          TextColor="{StaticResource ColorAccent}"
+                                          FontAttributes="Bold" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>
+                    </VerticalStackLayout>
+
+                    <!-- Золото -->
+                    <Frame Grid.Column="1"
+                           BackgroundColor="{StaticResource ColorSurface}"
+                           BorderColor="{StaticResource ColorBorder}"
+                           CornerRadius="8" Padding="10,6"
+                           VerticalOptions="Center">
                         <Label>
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="Опыт: " TextColor="{StaticResource ColorSecondary}" />
-                                    <Span Text="{Binding Character.Experience}"
-                                          TextColor="{StaticResource ColorTextPrimary}" />
+                                    <Span Text="💰 " FontSize="14" />
+                                    <Span Text="{Binding Character.Balance, StringFormat='{0:N0} г'}"
+                                          TextColor="{StaticResource ColorCurrency}"
+                                          FontAttributes="Bold" FontSize="14" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>
-                    </HorizontalStackLayout>
+                    </Frame>
+                </Grid>
 
-                    <!-- Разделитель -->
-                    <BoxView HeightRequest="1"
-                             Color="{StaticResource ColorBorder}"
-                             Margin="0,4" />
+                <!-- ── Опыт ── -->
+                <Label Style="{StaticResource CaptionLabel}" Margin="0,0,0,4">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Опыт: " />
+                            <Span Text="{Binding Character.Experience}"
+                                  TextColor="{StaticResource ColorAccent}"
+                                  FontAttributes="Bold" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <ProgressBar
+                    Progress="{Binding Character.Experience}"
+                    ProgressColor="{StaticResource ColorAccent}"
+                    BackgroundColor="{StaticResource ColorSurface}"
+                    Margin="0,0,0,12" />
 
-                    <!-- Статы в сетке -->
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="8">
+                <!-- ── Характеристики ── -->
+                <Frame BackgroundColor="{StaticResource ColorSurface}"
+                       BorderColor="{StaticResource ColorBorder}"
+                       CornerRadius="10" Padding="12" Margin="0,0,0,4">
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto"
+                          RowSpacing="10" ColumnSpacing="10">
 
                         <!-- HP -->
                         <Frame Grid.Row="0" Grid.Column="0"
                                BackgroundColor="#2C1810"
                                BorderColor="{StaticResource ColorBorder}"
                                CornerRadius="8" Padding="10">
-                            <VerticalStackLayout>
-                                <Label Text="❤ HP" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="❤ HP"
+                                       TextColor="{StaticResource ColorSecondary}"
+                                       FontSize="11" />
                                 <Label Text="{Binding Character.Health}"
-                                       TextColor="#FF6B6B" FontSize="20" FontAttributes="Bold" />
+                                       TextColor="#FF6B6B"
+                                       FontSize="20"
+                                       FontAttributes="Bold" />
                             </VerticalStackLayout>
                         </Frame>
 
-                        <!-- Mana -->
+                        <!-- Мана -->
                         <Frame Grid.Row="0" Grid.Column="1"
                                BackgroundColor="#2C1810"
                                BorderColor="{StaticResource ColorBorder}"
                                CornerRadius="8" Padding="10">
-                            <VerticalStackLayout>
-                                <Label Text="💧 Мана" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="✨ Мана"
+                                       TextColor="{StaticResource ColorSecondary}"
+                                       FontSize="11" />
                                 <Label Text="{Binding Character.Mana}"
-                                       TextColor="#6B9FFF" FontSize="20" FontAttributes="Bold" />
+                                       TextColor="#6B9FFF"
+                                       FontSize="20"
+                                       FontAttributes="Bold" />
                             </VerticalStackLayout>
                         </Frame>
 
-                        <!-- Armor -->
+                        <!-- Броня -->
                         <Frame Grid.Row="1" Grid.Column="0"
                                BackgroundColor="#2C1810"
                                BorderColor="{StaticResource ColorBorder}"
                                CornerRadius="8" Padding="10">
-                            <VerticalStackLayout>
-                                <Label Text="🛡 Броня" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="🛡 Броня"
+                                       TextColor="{StaticResource ColorSecondary}"
+                                       FontSize="11" />
                                 <Label Text="{Binding Character.Armor}"
-                                       TextColor="{StaticResource ColorHighlight}" FontSize="20" FontAttributes="Bold" />
+                                       TextColor="{StaticResource ColorHighlight}"
+                                       FontSize="20"
+                                       FontAttributes="Bold" />
                             </VerticalStackLayout>
                         </Frame>
 
-                        <!-- Damage -->
+                        <!-- Урон -->
                         <Frame Grid.Row="1" Grid.Column="1"
                                BackgroundColor="#2C1810"
                                BorderColor="{StaticResource ColorBorder}"
                                CornerRadius="8" Padding="10">
-                            <VerticalStackLayout>
-                                <Label Text="⚔ Урон" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="⚔ Урон"
+                                       TextColor="{StaticResource ColorSecondary}"
+                                       FontSize="11" />
                                 <Label Text="{Binding Character.Damage}"
-                                       TextColor="{StaticResource ColorAccent}" FontSize="20" FontAttributes="Bold" />
+                                       TextColor="{StaticResource ColorAccent}"
+                                       FontSize="20"
+                                       FontAttributes="Bold" />
                             </VerticalStackLayout>
                         </Frame>
+                    </Grid>
+                </Frame>
+
+                <Button Text="⬆ Улучшить характеристики"
+                        Command="{Binding GoToUpgradeCommand}"
+                        Style="{StaticResource SecondaryButton}"
+                        Margin="0,8,0,0" />
+
+                <!-- ══════════════════════════════
+                     СЕКЦИЯ: ЭКИПИРОВКА
+                ══════════════════════════════ -->
+                <Label Text="ЭКИПИРОВКА" Style="{StaticResource SectionTitle}" />
+
+                <!-- ── Оружие (3 слота) ── -->
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,0,0,4">
+
+                    <!-- Слот 1 -->
+                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                        <Border Style="{StaticResource SlotBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding UnequipCommand}"
+                                    CommandParameter="{Binding WeaponSlot1.Id}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding WeaponSlot1.ItemName, TargetNullValue='—'}"
+                                       FontSize="11"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="3"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding WeaponSlot1.Rarity}"
+                                       Style="{StaticResource RarityLabel}"
+                                       IsVisible="{Binding WeaponSlot1.IsEquipped}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label Text="Оружие" Style="{StaticResource SlotCaption}" />
+                    </VerticalStackLayout>
+
+                    <!-- Слот 2 -->
+                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                        <Border Style="{StaticResource SlotBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding UnequipCommand}"
+                                    CommandParameter="{Binding WeaponSlot2.Id}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding WeaponSlot2.ItemName, TargetNullValue='—'}"
+                                       FontSize="11"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="3"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding WeaponSlot2.Rarity}"
+                                       Style="{StaticResource RarityLabel}"
+                                       IsVisible="{Binding WeaponSlot2.IsEquipped}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label Text="Оружие" Style="{StaticResource SlotCaption}" />
+                    </VerticalStackLayout>
+
+                    <!-- Слот 3 -->
+                    <VerticalStackLayout Grid.Column="2" Spacing="2">
+                        <Border Style="{StaticResource SlotBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding UnequipCommand}"
+                                    CommandParameter="{Binding WeaponSlot3.Id}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding WeaponSlot3.ItemName, TargetNullValue='—'}"
+                                       FontSize="11"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="3"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding WeaponSlot3.Rarity}"
+                                       Style="{StaticResource RarityLabel}"
+                                       IsVisible="{Binding WeaponSlot3.IsEquipped}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label Text="Оружие" Style="{StaticResource SlotCaption}" />
+                    </VerticalStackLayout>
+
+                </Grid>
+
+                <!-- ── Кольца + Шлем/Броня/Ботинки ── -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,8,0,0">
+
+                    <!-- Левая колонка: 2 кольца -->
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+
+                        <Border Style="{StaticResource SlotBorder}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding UnequipCommand}"
+                                    CommandParameter="{Binding RingSlot1.Id}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding RingSlot1.ItemName, TargetNullValue='—'}"
+                                       FontSize="10"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="3"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding RingSlot1.Rarity}"
+                                       Style="{StaticResource RarityLabel}"
+                                       IsVisible="{Binding RingSlot1.IsEquipped}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label Text="Кольцо" Style="{StaticResource SlotCaption}" />
+
+                        <Border Style="{StaticResource SlotBorder}" Margin="0,4,0,0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding UnequipCommand}"
+                                    CommandParameter="{Binding RingSlot2.Id}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding RingSlot2.ItemName, TargetNullValue='—'}"
+                                       FontSize="10"
+                                       TextColor="{StaticResource ColorTextPrimary}"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center"
+                                       MaxLines="3"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding RingSlot2.Rarity}"
+                                       Style="{StaticResource RarityLabel}"
+                                       IsVisible="{Binding RingSlot2.IsEquipped}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label Text="Кольцо" Style="{StaticResource SlotCaption}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Правая колонка: Шлем / Броня / Ботинки -->
+                    <Grid Grid.Column="1"
+                          ColumnDefinitions="*,*,*"
+                          ColumnSpacing="8">
+
+                        <!-- Шлем -->
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Border Style="{StaticResource SlotBorder}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding UnequipCommand}"
+                                        CommandParameter="{Binding HelmetSlot.Id}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding HelmetSlot.ItemName, TargetNullValue='—'}"
+                                           FontSize="10"
+                                           TextColor="{StaticResource ColorTextPrimary}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           MaxLines="3"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding HelmetSlot.Rarity}"
+                                           Style="{StaticResource RarityLabel}"
+                                           IsVisible="{Binding HelmetSlot.IsEquipped}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Label Text="Шлем" Style="{StaticResource SlotCaption}" />
+                        </VerticalStackLayout>
+
+                        <!-- Броня -->
+                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                            <Border Style="{StaticResource SlotBorder}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding UnequipCommand}"
+                                        CommandParameter="{Binding ArmorSlot.Id}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding ArmorSlot.ItemName, TargetNullValue='—'}"
+                                           FontSize="10"
+                                           TextColor="{StaticResource ColorTextPrimary}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           MaxLines="3"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding ArmorSlot.Rarity}"
+                                           Style="{StaticResource RarityLabel}"
+                                           IsVisible="{Binding ArmorSlot.IsEquipped}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Label Text="Броня" Style="{StaticResource SlotCaption}" />
+                        </VerticalStackLayout>
+
+                        <!-- Ботинки -->
+                        <VerticalStackLayout Grid.Column="2" Spacing="2">
+                            <Border Style="{StaticResource SlotBorder}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding UnequipCommand}"
+                                        CommandParameter="{Binding BootsSlot.Id}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding BootsSlot.ItemName, TargetNullValue='—'}"
+                                           FontSize="10"
+                                           TextColor="{StaticResource ColorTextPrimary}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           MaxLines="3"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding BootsSlot.Rarity}"
+                                           Style="{StaticResource RarityLabel}"
+                                           IsVisible="{Binding BootsSlot.IsEquipped}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Label Text="Ботинки" Style="{StaticResource SlotCaption}" />
+                        </VerticalStackLayout>
 
                     </Grid>
+                </Grid>
 
-                    <!-- Баланс -->
-                    <Frame BackgroundColor="#2C1810"
-                           BorderColor="{StaticResource ColorCurrency}"
-                           CornerRadius="8" Padding="12">
-                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
-                            <Label Text="💰 Баланс:" TextColor="{StaticResource ColorSecondary}" />
-                            <Label Text="{Binding Character.Balance, StringFormat='{0:F2} G'}"
-                                   TextColor="{StaticResource ColorCurrency}"
-                                   FontAttributes="Bold" FontSize="18" />
-                        </HorizontalStackLayout>
-                    </Frame>
 
-                    <Button Text="Улучшить характеристики"
-                            Command="{Binding GoToUpgradeCommand}"
-                            Style="{StaticResource PrimaryButton}"
-                            Margin="0,8,0,0" />
-                </VerticalStackLayout>
-            </Frame>
+                <!-- ══════════════════════════════
+                     СЕКЦИЯ: ИНВЕНТАРЬ
+                ══════════════════════════════ -->
+                <Label Text="ИНВЕНТАРЬ" Style="{StaticResource SectionTitle}" />
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               Color="{StaticResource ColorAccent}"
-                               HorizontalOptions="Center" />
+                <CollectionView
+                    ItemsSource="{Binding AllItems}"
+                    HeightRequest="360"
+                    SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="inv:InventoryItemDto">
+                            <Border
+                                BackgroundColor="{StaticResource ColorSurface}"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="6"
+                                Margin="4"
+                                WidthRequest="100"
+                                HeightRequest="100">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EquipCommand}"
+                                        CommandParameter="{Binding Id}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding ItemType}"
+                                           FontSize="9"
+                                           TextColor="{StaticResource ColorSecondary}"
+                                           HorizontalOptions="Center" />
+                                    <Label Text="{Binding ItemName}"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource ColorTextPrimary}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           MaxLines="2"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding Rarity}"
+                                           FontSize="9"
+                                           TextColor="{StaticResource ColorHighlight}"
+                                           HorizontalOptions="Center" />
+                                    <Label FontSize="10"
+                                           TextColor="{StaticResource ColorSecondary}"
+                                           HorizontalOptions="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="x" />
+                                                <Span Text="{Binding Quantity}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Label Text="✓ Надето"
+                                           FontSize="9"
+                                           TextColor="{StaticResource ColorAccent}"
+                                           HorizontalOptions="Center"
+                                           IsVisible="{Binding IsEquipped}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
 
+                    <CollectionView.EmptyView>
+                        <Label Text="Инвентарь пуст"
+                               Style="{StaticResource CaptionLabel}"
+                               HorizontalOptions="Center"
+                               Margin="0,16" />
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+            </VerticalStackLayout>
+            <!-- /HasCharacter -->
+
+            <!-- Ошибка -->
             <Label Text="{Binding ErrorMessage}"
                    TextColor="#FF6B6B"
                    IsVisible="{Binding HasError}"
-                   HorizontalOptions="Center" />
+                   HorizontalOptions="Center"
+                   Margin="0,8" />
+
+            <!-- Загрузка -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="{StaticResource ColorAccent}"
+                HorizontalOptions="Center"
+                Margin="0,12" />
 
         </VerticalStackLayout>
     </ScrollView>

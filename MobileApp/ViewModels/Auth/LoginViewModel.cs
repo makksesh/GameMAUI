@@ -61,7 +61,7 @@ public class LoginViewModel : BaseViewModel
             }
 
             await _session.SaveAsync(result);
-            await Shell.Current.GoToAsync("//MainTabs/CharacterTab/CharacterPage");
+            await Shell.Current.GoToAsync("//HomePage");
         });
     }
 }
