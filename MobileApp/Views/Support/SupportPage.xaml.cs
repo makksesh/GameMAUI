@@ -24,7 +24,7 @@ public partial class SupportPage : ContentPage
 
     private async void OnTicketTapped(object sender, TappedEventArgs e)
     {
-        if (sender is not Frame frame || frame.BindingContext is not SupportTicketDto ticket)
+        if (sender is not Border border || border.BindingContext is not SupportTicketDto ticket)
             return;
 
         var page = _serviceProvider.GetRequiredService<TicketChatPage>();

@@ -14,4 +14,8 @@ public class InventoryItemDto
     public int Quantity { get; set; }
     public bool IsEquipped { get; set; }
     public decimal BasePrice { get; set; }
+
+    /// <summary>Флаг пустой заглушки — не сериализуется с сервера, только клиентский.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsEmpty { get; set; }
 }

@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage 
+<ContentPage
     x:Class="MobileApp.Views.Support.TicketChatPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:converters="clr-namespace:MobileApp.Converters"
     Title="{Binding TicketSubject}">
+
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#0D2231" Offset="0.20" />
+            <GradientStop Color="#64226A" Offset="0.50" />
+            <GradientStop Color="#144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -14,68 +22,107 @@
 
     <Grid RowDefinitions="Auto, *, Auto">
 
-        <Frame Grid.Row="0"
-               Margin="16,8,16,4"
-               Padding="8,4"
-               BackgroundColor="#2C1810"
-               BorderColor="{StaticResource ColorBorder}"
-               CornerRadius="8"
-               HorizontalOptions="Center">
+        <!-- ═══ Статус тикета ═══ -->
+        <Border Grid.Row="0"
+                Margin="16,8,16,4"
+                Padding="10,5"
+                BackgroundColor="{StaticResource ColorSurface}"
+                StrokeThickness="0"
+                HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
             <Label Text="{Binding TicketStatus, StringFormat='Статус: {0}'}"
                    TextColor="{StaticResource ColorHighlight}"
-                   FontSize="11" />
-        </Frame>
+                   FontSize="12" />
+        </Border>
 
+        <!-- ═══ Сообщения ═══ -->
         <CollectionView Grid.Row="1"
                         ItemsSource="{Binding Messages}"
-                        Margin="12,0"
+                        Margin="12,4"
                         SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="4,2">
-                        <Frame BackgroundColor="#3D2416"
-                               BorderColor="{StaticResource ColorBorder}"
-                               CornerRadius="12"
-                               Padding="12,8"
-                               MaximumWidthRequest="260"
-                               HorizontalOptions="{Binding IsFromModerator, Converter={StaticResource BoolToLayoutOptionsConverter}}">
+                    <Grid Padding="4,3">
+
+                        <!--
+                            IsFromModerator=true  → сообщение модератора → слева (Start)
+                            IsFromModerator=false → сообщение игрока    → справа (End)
+                            
+                            BoolToLayoutOptionsConverter:
+                              true  → LayoutOptions.End
+                              false → LayoutOptions.Start
+                            
+                            Нам нужна инверсия: игрок (false) → End, модератор (true) → Start
+                            Поэтому используем IsFromModerator НЕ через конвертер,
+                            а задаём явно HorizontalOptions через Trigger.
+                        -->
+                        <Border MaximumWidthRequest="270"
+                                StrokeThickness="0"
+                                Padding="12,8">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+
+                            <!-- Триггеры: игрок справа фиолетовый, модератор слева синий -->
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding IsFromModerator}"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
+                                    <Setter Property="HorizontalOptions" Value="End" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding IsFromModerator}"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorSurface}" />
+                                    <Setter Property="HorizontalOptions" Value="Start" />
+                                </DataTrigger>
+                            </Border.Triggers>
 
                             <VerticalStackLayout Spacing="4">
                                 <Label Text="{Binding AuthorUsername}"
-                                       TextColor="{StaticResource ColorHighlight}"
+                                       TextColor="{StaticResource ColorPlaceholder}"
                                        FontAttributes="Bold"
                                        FontSize="11" />
-
                                 <Label Text="{Binding Text}"
                                        TextColor="{StaticResource ColorTextPrimary}"
                                        FontSize="14" />
-
                                 <Label Text="{Binding CreatedAt, StringFormat='{0:HH:mm}'}"
-                                       TextColor="{StaticResource ColorSecondary}"
+                                       TextColor="{StaticResource ColorPlaceholder}"
                                        FontSize="10"
                                        HorizontalOptions="End" />
                             </VerticalStackLayout>
+                        </Border>
 
-                        </Frame>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <!-- ═══ Поле ввода + кнопка отправки ═══ -->
         <Grid Grid.Row="2"
               ColumnDefinitions="*, Auto"
-              Padding="16,10"
-              BackgroundColor="#3D2416">
+              Padding="12,8">
 
-            <Editor Grid.Column="0"
-                    Text="{Binding NewText}"
-                    Placeholder="Написать сообщение..."
-                    PlaceholderColor="{StaticResource ColorSecondary}"
-                    TextColor="{StaticResource ColorTextPrimary}"
-                    BackgroundColor="#2C1810"
-                    AutoSize="TextChanges"
-                    MaximumHeightRequest="120"
-                    VerticalOptions="Center" />
+            <Border Grid.Column="0"
+                    Stroke="White"
+                    StrokeThickness="1"
+                    BackgroundColor="Transparent">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Editor Text="{Binding NewText}"
+                        Placeholder="Написать сообщение..."
+                        PlaceholderColor="{StaticResource ColorPlaceholder}"
+                        TextColor="{StaticResource ColorTextPrimary}"
+                        BackgroundColor="Transparent"
+                        AutoSize="TextChanges"
+                        MaximumHeightRequest="120"
+                        VerticalOptions="Center"
+                        Margin="8,2" />
+            </Border>
 
             <Button Grid.Column="1"
                     Text="➤"
@@ -86,10 +133,11 @@
                     HeightRequest="48" />
         </Grid>
 
+        <!-- ═══ Индикатор загрузки ═══ -->
         <ActivityIndicator Grid.Row="1"
                            IsRunning="{Binding IsBusy}"
                            IsVisible="{Binding IsBusy}"
-                           Color="{StaticResource ColorAccent}"
+                           Color="{StaticResource ColorPrimary}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
 

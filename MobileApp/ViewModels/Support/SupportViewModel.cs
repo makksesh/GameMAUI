@@ -11,8 +11,24 @@ public class SupportViewModel : BaseViewModel
     public List<SupportTicketDto> Tickets { get => _tickets; set => SetProperty(ref _tickets, value); }
     private List<SupportTicketDto> _tickets = [];
 
-    public string NewSubject { get => _subject; set => SetProperty(ref _subject, value); }
-    public string NewMessage { get => _message; set => SetProperty(ref _message, value); }
+    public string NewSubject
+    {
+        get => _subject;
+        set
+        {
+            SetProperty(ref _subject, value);
+            NotifyCommandsCanExecuteChanged();
+        }
+    }
+    public string NewMessage
+    {
+        get => _message;
+        set
+        {
+            SetProperty(ref _message, value);
+            NotifyCommandsCanExecuteChanged();
+        }
+    }
     private string _subject = string.Empty;
     private string _message = string.Empty;
 
@@ -26,9 +42,15 @@ public class SupportViewModel : BaseViewModel
         _supportApi = supportApi;
 
         LoadCommand   = new Command(async () => await LoadAsync());
-        CreateCommand = new Command(async () => await CreateAsync(), () => !IsBusy);
+        CreateCommand = new Command(
+            async () => await CreateAsync(),
+            () => !IsBusy
+                  && !string.IsNullOrWhiteSpace(NewSubject)
+                  && !string.IsNullOrWhiteSpace(NewMessage));
         CloseCommand  = new Command<Guid>(async id => await CloseAsync(id));
         ReopenCommand = new Command<Guid>(async id => await ReopenAsync(id));
+        
+        Track(CreateCommand);
     }
 
     public async Task LoadAsync()
@@ -47,6 +69,13 @@ public class SupportViewModel : BaseViewModel
                 Message = NewMessage
             });
             if (ticket is null) return;
+
+            // Сразу отправляем описание как первое сообщение в чат
+            await _supportApi.SendMessageAsync(ticket.Id, new SendMessageRequest
+            {
+                Text = NewMessage
+            });
+
             Tickets = [ticket, ..Tickets];
             NewSubject = string.Empty;
             NewMessage = string.Empty;

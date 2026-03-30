@@ -3,63 +3,138 @@
     x:Class="MobileApp.Views.Auth.RegisterPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Регистрация">
+    Title="">
+
+    <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <ScrollView>
-        <VerticalStackLayout Padding="32" Spacing="14">
+        <VerticalStackLayout
+            Padding="28"
+            Spacing="0"
+            VerticalOptions="Start">
 
-            <Label Text="Создать аккаунт"
-                   Style="{StaticResource TitleLabel}"
-                   HorizontalOptions="Center"
-                   Margin="0,16,0,16"/>
+            <!-- ═══ ЗАГОЛОВОК ═══ -->
+            <Label
+                Text="⚔"
+                TextColor="White"
+                FontSize="48"
+                HorizontalOptions="Center"
+                Margin="0,40,0,8" />
 
-            <Entry Placeholder="Логин"
-                   Text="{Binding Username}"
-                   PlaceholderColor="{StaticResource ColorSecondary}"
-                   TextColor="{StaticResource ColorTextPrimary}"
-                   BackgroundColor="#3D2416" />
+            <Label
+                Text="Создать аккаунт"
+                Style="{StaticResource TitleLabel}"
+                HorizontalOptions="Center"
+                Margin="0,0,0,8" />
 
-            <Entry Placeholder="Email"
-                   Text="{Binding Email}"
-                   PlaceholderColor="{StaticResource ColorSecondary}"
-                   TextColor="{StaticResource ColorTextPrimary}"
-                   BackgroundColor="#3D2416"
-                   Keyboard="Email" />
+            <Label
+                Text="Заполните данные для регистрации"
+                TextColor="{StaticResource ColorPlaceholder}"
+                FontSize="14"
+                HorizontalOptions="Center"
+                Margin="0,0,0,32" />
 
-            <Entry Placeholder="Пароль"
-                   Text="{Binding Password}"
-                   PlaceholderColor="{StaticResource ColorSecondary}"
-                   TextColor="{StaticResource ColorTextPrimary}"
-                   BackgroundColor="#3D2416"
-                   IsPassword="True" />
+            <!-- ═══ ЛОГИН ═══ -->
+            <Border Style="{StaticResource InputBorder}">
+                <Entry
+                    Style="{StaticResource InputEntry}"
+                    Placeholder="Логин"
+                    Text="{Binding Username}"
+                    ReturnType="Next" />
+            </Border>
 
-            <Entry Placeholder="Подтвердите пароль"
-                   Text="{Binding ConfirmPassword}"
-                   PlaceholderColor="{StaticResource ColorSecondary}"
-                   TextColor="{StaticResource ColorTextPrimary}"
-                   BackgroundColor="#3D2416"
-                   IsPassword="True" />
+            <!-- ═══ EMAIL ═══ -->
+            <Border Style="{StaticResource InputBorder}">
+                <Entry
+                    Style="{StaticResource InputEntry}"
+                    Placeholder="Email"
+                    Text="{Binding Email}"
+                    Keyboard="Email"
+                    ReturnType="Next" />
+            </Border>
 
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="#FF6B6B"
-                   IsVisible="{Binding HasError}"
-                   HorizontalOptions="Center" />
+            <!-- ═══ ПАРОЛЬ ═══ -->
+            <Border Style="{StaticResource InputBorder}">
+                <Entry
+                    Style="{StaticResource InputEntry}"
+                    Placeholder="Пароль"
+                    Text="{Binding Password}"
+                    IsPassword="True"
+                    ReturnType="Next" />
+            </Border>
 
-            <Button Text="Зарегистрироваться"
-                    Command="{Binding RegisterCommand}"
-                    Style="{StaticResource PrimaryButton}" />
+            <!-- ═══ ПОДТВЕРЖДЕНИЕ ПАРОЛЯ ═══ -->
+            <Border Style="{StaticResource InputBorder}" Margin="0,0,0,8">
+                <Entry
+                    Style="{StaticResource InputEntry}"
+                    Placeholder="Подтвердите пароль"
+                    Text="{Binding ConfirmPassword}"
+                    IsPassword="True"
+                    ReturnType="Done" />
+            </Border>
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               Color="{StaticResource ColorAccent}"
-                               HorizontalOptions="Center" />
+            <!-- ═══ ОШИБКА ═══ -->
+            <Label
+                Text="{Binding ErrorMessage}"
+                TextColor="{StaticResource ColorError}"
+                IsVisible="{Binding HasError}"
+                HorizontalOptions="Center"
+                Margin="0,0,0,12" />
 
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
-                <Label Text="Уже есть аккаунт?"
-                       TextColor="{StaticResource ColorSecondary}" />
-                <Label Text="Войти"
-                       TextColor="{StaticResource ColorAccent}"
-                       TextDecorations="Underline">
+            <!-- ═══ ИНДИКАТОР ═══ -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="White"
+                HorizontalOptions="Center"
+                Margin="0,0,0,12" />
+
+            <!-- ═══ КНОПКА ЗАРЕГИСТРИРОВАТЬСЯ ═══ -->
+            <Border
+                BackgroundColor="{StaticResource ColorPrimary}"
+                StrokeThickness="0"
+                Margin="0,8,0,20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15" />
+                </Border.StrokeShape>
+                <Grid>
+                    <Button
+                        Text="Зарегистрироваться"
+                        TextColor="White"
+                        BackgroundColor="Transparent"
+                        Command="{Binding RegisterCommand}"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        HorizontalOptions="Fill"
+                        Padding="0,14" />
+                    <Image
+                        Source="icon_register.png"
+                        HeightRequest="18" WidthRequest="18"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Margin="0,0,16,0" />
+                </Grid>
+            </Border>
+
+            <!-- ═══ ССЫЛКА НА ВХОД ═══ -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,0,0,40">
+                <Label
+                    Text="Уже есть аккаунт?"
+                    TextColor="{StaticResource ColorPlaceholder}"
+                    FontSize="14" />
+                <Label
+                    Text="Войти"
+                    TextColor="White"
+                    FontSize="14"
+                    FontAttributes="Bold"
+                    TextDecorations="Underline">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
                     </Label.GestureRecognizers>

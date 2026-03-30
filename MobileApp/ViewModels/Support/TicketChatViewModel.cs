@@ -40,6 +40,8 @@ public class TicketChatViewModel : BaseViewModel
         SendCommand = new Command(
             async () => await SendAsync(),
             () => !IsBusy && !string.IsNullOrWhiteSpace(NewText));
+
+        Track(SendCommand);
     }
 
     public async Task LoadAsync()

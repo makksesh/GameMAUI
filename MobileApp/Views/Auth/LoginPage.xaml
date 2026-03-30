@@ -3,79 +3,119 @@
     x:Class="MobileApp.Views.Auth.LoginPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Вход">
+    Title="">
+
+    <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <ScrollView>
         <VerticalStackLayout
-            Padding="32"
-            Spacing="16"
+            Padding="28"
+            Spacing="0"
             VerticalOptions="Center">
 
-            <!-- Логотип / заголовок -->
+            <!-- ═══ ЛОГОТИП ═══ -->
             <Label
-                Text="⚔ GameRPG"
-                Style="{StaticResource TitleLabel}"
+                Text="⚔"
+                TextColor="White"
+                FontSize="52"
                 HorizontalOptions="Center"
+                Margin="0,40,0,8" />
+
+            <Label
+                Text="GameRPG"
+                Style="{StaticResource TitleLabel}"
                 FontSize="32"
-                Margin="0,0,0,24" />
+                HorizontalOptions="Center"
+                Margin="0,0,0,8" />
 
-            <!-- Поля ввода -->
-            <Entry
-                Placeholder="Логин"
-                PlaceholderColor="{StaticResource ColorSecondary}"
-                Text="{Binding Username}"
-                TextColor="{StaticResource ColorTextPrimary}"
-                BackgroundColor="#3D2416"
-                ReturnType="Next" />
+            <Label
+                Text="Войдите в свой аккаунт"
+                TextColor="{StaticResource ColorPlaceholder}"
+                FontSize="14"
+                HorizontalOptions="Center"
+                Margin="0,0,0,40" />
 
-            <Entry
-                Placeholder="Пароль"
-                PlaceholderColor="{StaticResource ColorSecondary}"
-                Text="{Binding Password}"
-                TextColor="{StaticResource ColorTextPrimary}"
-                BackgroundColor="#3D2416"
-                IsPassword="True"
-                ReturnType="Done" />
+            <!-- ═══ ЛОГИН ═══ -->
+            <Border Style="{StaticResource InputBorder}">
+                <Entry
+                    Style="{StaticResource InputEntry}"
+                    Placeholder="Логин"
+                    Text="{Binding Username}"
+                    ReturnType="Next" />
+            </Border>
 
-            <!-- Ошибка -->
+            <!-- ═══ ПАРОЛЬ ═══ -->
+            <Border Style="{StaticResource InputBorder}" Margin="0,0,0,8">
+                <Entry
+                    Style="{StaticResource InputEntry}"
+                    Placeholder="Пароль"
+                    Text="{Binding Password}"
+                    IsPassword="True"
+                    ReturnType="Done" />
+            </Border>
+
+            <!-- ═══ ОШИБКА ═══ -->
             <Label
                 Text="{Binding ErrorMessage}"
-                TextColor="#FF6B6B"
+                TextColor="{StaticResource ColorError}"
                 IsVisible="{Binding HasError}"
-                HorizontalOptions="Center" />
-            
+                HorizontalOptions="Center"
+                Margin="0,0,0,12" />
 
-            <ActivityIndicator 
-                IsRunning="{Binding IsBusy}"
-                IsVisible="{Binding IsBusy}"
-                Color="{StaticResource ColorAccent}"
-                HorizontalOptions="Center" />
-
-
-            <!-- Кнопка входа -->
-            <Button
-                Text="Войти"
-                Command="{Binding LoginCommand}"
-                Style="{StaticResource PrimaryButton}"
-                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}" />
-
-            <!-- Индикатор загрузки -->
+            <!-- ═══ ИНДИКАТОР ═══ -->
             <ActivityIndicator
                 IsRunning="{Binding IsBusy}"
                 IsVisible="{Binding IsBusy}"
-                Color="{StaticResource ColorAccent}"
-                HorizontalOptions="Center" />
-
-            <!-- Регистрация -->
-            <HorizontalStackLayout
+                Color="White"
                 HorizontalOptions="Center"
-                Spacing="4">
+                Margin="0,0,0,12" />
+
+            <!-- ═══ КНОПКА ВОЙТИ ═══ -->
+            <Border
+                BackgroundColor="{StaticResource ColorPrimary}"
+                StrokeThickness="0"
+                Margin="0,8,0,20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15" />
+                </Border.StrokeShape>
+                <Grid>
+                    <Button
+                        Text="Войти"
+                        TextColor="White"
+                        BackgroundColor="Transparent"
+                        Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        HorizontalOptions="Fill"
+                        Padding="0,14" />
+                    <Image
+                        Source="icon_login.png"
+                        HeightRequest="18" WidthRequest="18"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Margin="0,0,16,0" />
+                </Grid>
+            </Border>
+
+            <!-- ═══ ССЫЛКА НА РЕГИСТРАЦИЮ ═══ -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,0,0,40">
                 <Label
                     Text="Нет аккаунта?"
-                    TextColor="{StaticResource ColorSecondary}" />
+                    TextColor="{StaticResource ColorPlaceholder}"
+                    FontSize="14" />
                 <Label
                     Text="Зарегистрироваться"
-                    TextColor="{StaticResource ColorAccent}"
+                    TextColor="White"
+                    FontSize="14"
+                    FontAttributes="Bold"
                     TextDecorations="Underline">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />

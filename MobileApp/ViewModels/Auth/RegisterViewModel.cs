@@ -71,7 +71,7 @@ public class RegisterViewModel : BaseViewModel
             if (result is null) return;
 
             await _session.SaveAsync(result);
-            await Shell.Current.GoToAsync("//MainTabs/CharacterTab/CharacterPage");
+            await Shell.Current.GoToAsync("//HomePage");
         });
     }
 }

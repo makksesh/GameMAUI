@@ -5,70 +5,109 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Поддержка">
 
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#0D2231" Offset="0.20" />
+            <GradientStop Color="#64226A" Offset="0.50" />
+            <GradientStop Color="#144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
 
-            <Frame BackgroundColor="#3D2416"
-                   BorderColor="{StaticResource ColorBorder}"
-                   CornerRadius="10"
-                   Padding="14">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Новый тикет"
+            <!-- ═══ НОВОЕ ОБРАЩЕНИПЕ ═══ -->
+            <Border BackgroundColor="#1A1A2E"
+                    Stroke="{StaticResource ColorBorder}"
+                    StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12" Padding="16">
+
+                    <Label Text="Новое обращение"
                            Style="{StaticResource TitleLabel}"
                            FontSize="18" />
 
-                    <Entry Placeholder="Тема"
-                           Text="{Binding NewSubject}"
-                           PlaceholderColor="{StaticResource ColorSecondary}"
-                           TextColor="{StaticResource ColorTextPrimary}"
-                           BackgroundColor="#2C1810" />
+                    <!-- Тема -->
+                    <Border Style="{StaticResource InputBorder}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry Style="{StaticResource InputEntry}"
+                               Placeholder="Тема"
+                               Text="{Binding NewSubject}"
+                               ReturnType="Next" />
+                    </Border>
 
-                    <Editor Placeholder="Описание проблемы..."
-                            Text="{Binding NewMessage}"
-                            PlaceholderColor="{StaticResource ColorSecondary}"
-                            TextColor="{StaticResource ColorTextPrimary}"
-                            BackgroundColor="#2C1810"
-                            HeightRequest="100" />
+                    <!-- Описание проблемы -->
+                    <Border Stroke="White"
+                            StrokeThickness="1"
+                            BackgroundColor="Transparent">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Editor Placeholder="Описание проблемы..."
+                                Text="{Binding NewMessage}"
+                                PlaceholderColor="{StaticResource ColorPlaceholder}"
+                                TextColor="{StaticResource ColorTextPrimary}"
+                                BackgroundColor="Transparent"
+                                HeightRequest="100"
+                                Margin="8,4" />
+                    </Border>
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{StaticResource ColorError}"
+                           IsVisible="{Binding HasError}"
+                           HorizontalOptions="Center" />
 
                     <Button Text="Отправить"
                             Command="{Binding CreateCommand}"
                             Style="{StaticResource PrimaryButton}" />
-                </VerticalStackLayout>
-            </Frame>
 
-            <Label Text="Мои тикеты"
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ═══ МОИ ОБРАЩЕНИЯ ═══ -->
+            <Label Text="Мои обращения"
                    Style="{StaticResource TitleLabel}"
                    FontSize="18" />
 
             <CollectionView ItemsSource="{Binding Tickets}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame BackgroundColor="#3D2416"
-                               BorderColor="{StaticResource ColorBorder}"
-                               CornerRadius="10"
-                               Margin="0,4"
-                               Padding="14">
-
-                            <Frame.GestureRecognizers>
+                        <Border Margin="0,4"
+                                BackgroundColor="#1A1A2E"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeThickness="1">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnTicketTapped" />
-                            </Frame.GestureRecognizers>
+                            </Border.GestureRecognizers>
 
-                            <VerticalStackLayout Spacing="6">
+                            <VerticalStackLayout Spacing="6" Padding="14">
+
                                 <HorizontalStackLayout Spacing="8">
                                     <Label Text="{Binding Subject}"
                                            TextColor="{StaticResource ColorTextPrimary}"
                                            FontAttributes="Bold"
                                            FontSize="15" />
-
-                                    <Label Text="{Binding Status}"
-                                           TextColor="{StaticResource ColorHighlight}"
-                                           FontSize="11"
-                                           BackgroundColor="#2C1810"
-                                           Padding="4,2" />
+                                    <Border BackgroundColor="{StaticResource ColorSurface}"
+                                            StrokeThickness="0"
+                                            Padding="6,2">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="6" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding Status}"
+                                               TextColor="{StaticResource ColorHighlight}"
+                                               FontSize="11" />
+                                    </Border>
                                 </HorizontalStackLayout>
 
                                 <Label Text="{Binding Message}"
-                                       TextColor="{StaticResource ColorSecondary}"
+                                       TextColor="{StaticResource ColorPlaceholder}"
                                        FontSize="12"
                                        MaxLines="2"
                                        LineBreakMode="TailTruncation" />
@@ -80,7 +119,6 @@
                                             Style="{StaticResource SecondaryButton}"
                                             FontSize="11"
                                             Padding="8,4" />
-
                                     <Button Text="Переоткрыть"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ReopenCommand}"
                                             CommandParameter="{Binding Id}"
@@ -88,16 +126,18 @@
                                             FontSize="11"
                                             Padding="8,4" />
                                 </HorizontalStackLayout>
+
                             </VerticalStackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
             <ActivityIndicator IsRunning="{Binding IsBusy}"
                                IsVisible="{Binding IsBusy}"
-                               Color="{StaticResource ColorAccent}"
+                               Color="{StaticResource ColorPrimary}"
                                HorizontalOptions="Center" />
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

@@ -3,78 +3,285 @@
     x:Class="MobileApp.Views.Inventory.InventoryPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Inventory"
+    xmlns:inv="clr-namespace:MobileApp.Models.Inventory"
+    x:DataType="vm:InventoryViewModel"
     Title="Инвентарь">
 
-    <CollectionView ItemsSource="{Binding Items}" Margin="16">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <Frame BackgroundColor="#3D2416"
-                       BorderColor="{StaticResource ColorBorder}"
-                       CornerRadius="10"
-                       Margin="0,4"
-                       Padding="14">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+    <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
-                            <!-- Название + редкость -->
-                            <HorizontalStackLayout Spacing="8">
-                                <Label Text="{Binding ItemName}"
-                                       TextColor="{StaticResource ColorTextPrimary}"
-                                       FontAttributes="Bold" FontSize="16" />
-                                <Label Text="{Binding Rarity}"
-                                       TextColor="{StaticResource ColorCurrency}"
-                                       FontSize="11"
-                                       BackgroundColor="#2C1810"
-                                       Padding="4,2" />
-                            </HorizontalStackLayout>
+    <ContentPage.Resources>
+        <!-- ── Слот экипировки ── -->
+        <Style x:Key="EquipSlot" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="#80F06B6F" />
+            <Setter Property="Stroke" Value="#FFC15A" />
+            <Setter Property="StrokeThickness" Value="1.8" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 25" />
+            <Setter Property="WidthRequest" Value="76" />
+            <Setter Property="HeightRequest" Value="76" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <!-- ── Ячейка общего инвентаря ── -->
+        <Style x:Key="InvCell" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="#80F06B6F" />
+            <Setter Property="Stroke" Value="#FFC15A" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 25" />
+            <Setter Property="WidthRequest" Value="70" />
+            <Setter Property="HeightRequest" Value="70" />
+            <Setter Property="Margin" Value="4" />
+        </Style>
+        <Style x:Key="SlotHint" TargetType="Label">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="TextColor" Value="#C4A67C" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="ItemInSlot" TargetType="Label">
+            <Setter Property="FontSize" Value="9" />
+            <Setter Property="TextColor" Value="#FFF5E1" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="MaxLines" Value="3" />
+            <Setter Property="LineBreakMode" Value="WordWrap" />
+        </Style>
+    </ContentPage.Resources>
 
-                            <!-- Тип и количество -->
-                            <HorizontalStackLayout Spacing="12">
-                                <Label Text="{Binding ItemType}"
-                                       TextColor="{StaticResource ColorSecondary}"
-                                       FontSize="12" />
-                                <Label TextColor="{StaticResource ColorSecondary}" FontSize="12">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="x" TextColor="{StaticResource ColorSecondary}" FontSize="12" />
-                                            <Span Text="{Binding Quantity}" TextColor="{StaticResource ColorTextPrimary}" FontSize="12" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                            </HorizontalStackLayout>
+    <ScrollView>
+        <Grid Padding="14,10" RowDefinitions="Auto,Auto,*" RowSpacing="0">
 
-                            <!-- Цена -->
-                            <Label FontSize="11">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="Цена: " TextColor="{StaticResource ColorSecondary}" FontSize="11" />
-                                        <Span Text="{Binding BasePrice, StringFormat='{0:F0} G'}"
-                                              TextColor="{StaticResource ColorCurrency}" FontSize="11" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
+            <!-- ══════════════════════════════════════════════════
+                 БЛОК 1: Характеристики (слева) + Слоты (справа)
+                 ══════════════════════════════════════════════════ -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="110,*"
+                  ColumnSpacing="8"
+                  Margin="0,0,0,16">
 
-                        </VerticalStackLayout>
+                <!-- ── ХАРАКТЕРИСТИКИ ── -->
+                <VerticalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Start" Margin="0,8,0,0">
 
-                        <!-- Кнопка экипировки -->
-                        <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
-                            <Button Text="Надеть"
-                                    IsVisible="{Binding IsEquipped, Converter={StaticResource InvertBoolConverter}}"
+                    <!-- Кнопка Улучшить -->
+                    <Button Text="Улучшить"
+                            Command="{Binding GoToUpgradeCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="#FFC15A"
+                            BorderColor="#FFC15A"
+                            BorderWidth="1"
+                            CornerRadius="10"
+                            FontSize="11"
+                            Padding="6,4"
+                            HorizontalOptions="Fill"
+                            Margin="0,0,0,4" />
+
+                    <!-- HP -->
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Image Source="icon_health.png" WidthRequest="32" HeightRequest="32" VerticalOptions="Center"/>
+                        <Label Text="{Binding Character.Health, FallbackValue='—'}"
+                               FontSize="22" FontAttributes="Bold"
+                               TextColor="#FFF5E1" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Защита -->
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Image Source="icon_defense.png" WidthRequest="32" HeightRequest="32" VerticalOptions="Center"/>
+                        <Label Text="{Binding Character.Armor, FallbackValue='—'}"
+                               FontSize="22" FontAttributes="Bold"
+                               TextColor="#FFF5E1" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Урон -->
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Image Source="icon_damage.png" WidthRequest="32" HeightRequest="32" VerticalOptions="Center"/>
+                        <Label Text="{Binding Character.Damage, FallbackValue='—'}"
+                               FontSize="22" FontAttributes="Bold"
+                               TextColor="#FFF5E1" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Мана -->
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Image Source="icon_mana.png" WidthRequest="32" HeightRequest="32" VerticalOptions="Center"/>
+                        <Label Text="{Binding Character.Mana, FallbackValue='—'}"
+                               FontSize="22" FontAttributes="Bold"
+                               TextColor="#FFF5E1" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+
+                <!-- ── СЛОТЫ ЭКИПИРОВКИ ── -->
+                <!--
+                    Макет (по Figma):
+                    [ Кольцо1 ]  [ пусто  ]  [ Шлем   ]
+                    [ Кольцо2 ]  [ пусто  ]  [ Броня  ]
+                    [ пусто   ]  [ пусто  ]  [ Ботинки]
+                -->
+                <Grid Grid.Column="1"
+                      RowDefinitions="Auto,Auto,Auto"
+                      ColumnDefinitions="*,*,*"
+                      RowSpacing="10"
+                      ColumnSpacing="8">
+
+                    <!-- Ряд 1: Кольцо1 | пусто | Шлем -->
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="4">
+                        <Border Style="{StaticResource EquipSlot}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding UnequipCommand}"
+                                                      CommandParameter="{Binding RingSlot1.Id}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding RingSlot1.ItemName, TargetNullValue='·'}"
+                                   Style="{StaticResource ItemInSlot}"
+                                   VerticalOptions="Center" Margin="4" />
+                        </Border>
+                        <Label Text="Кольцо 1" Style="{StaticResource SlotHint}" />
+                    </VerticalStackLayout>
+
+                    <!-- пусто (центр ряд 1) -->
+                    <BoxView Grid.Row="0" Grid.Column="1" IsVisible="False" />
+
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="2" Spacing="4">
+                        <Border Style="{StaticResource EquipSlot}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding UnequipCommand}"
+                                                      CommandParameter="{Binding HelmetSlot.Id}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding HelmetSlot.ItemName, TargetNullValue='·'}"
+                                   Style="{StaticResource ItemInSlot}"
+                                   VerticalOptions="Center" Margin="4" />
+                        </Border>
+                        <Label Text="Шлем" Style="{StaticResource SlotHint}" />
+                    </VerticalStackLayout>
+
+                    <!-- Ряд 2: Кольцо2 | пусто | Броня -->
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="4">
+                        <Border Style="{StaticResource EquipSlot}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding UnequipCommand}"
+                                                      CommandParameter="{Binding RingSlot2.Id}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding RingSlot2.ItemName, TargetNullValue='·'}"
+                                   Style="{StaticResource ItemInSlot}"
+                                   VerticalOptions="Center" Margin="4" />
+                        </Border>
+                        <Label Text="Кольцо 2" Style="{StaticResource SlotHint}" />
+                    </VerticalStackLayout>
+
+                    <!-- пусто (центр ряд 2) -->
+                    <BoxView Grid.Row="1" Grid.Column="1" IsVisible="False" />
+
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="2" Spacing="4">
+                        <Border Style="{StaticResource EquipSlot}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding UnequipCommand}"
+                                                      CommandParameter="{Binding ArmorSlot.Id}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding ArmorSlot.ItemName, TargetNullValue='·'}"
+                                   Style="{StaticResource ItemInSlot}"
+                                   VerticalOptions="Center" Margin="4" />
+                        </Border>
+                        <Label Text="Броня" Style="{StaticResource SlotHint}" />
+                    </VerticalStackLayout>
+
+                    <!-- Ряд 3: пусто | пусто | Ботинки -->
+                    <BoxView Grid.Row="2" Grid.Column="0" IsVisible="False" />
+                    <BoxView Grid.Row="2" Grid.Column="1" IsVisible="False" />
+
+                    <VerticalStackLayout Grid.Row="2" Grid.Column="2" Spacing="4">
+                        <Border Style="{StaticResource EquipSlot}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding UnequipCommand}"
+                                                      CommandParameter="{Binding BootsSlot.Id}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding BootsSlot.ItemName, TargetNullValue='·'}"
+                                   Style="{StaticResource ItemInSlot}"
+                                   VerticalOptions="Center" Margin="4" />
+                        </Border>
+                        <Label Text="Ботинки" Style="{StaticResource SlotHint}" />
+                    </VerticalStackLayout>
+
+                </Grid>
+            </Grid>
+
+            <!-- ══════════════════════════════════════════════════
+                 БЛОК 2: Слоты оружия — 3 штуки в ряд по центру
+                 ══════════════════════════════════════════════════ -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,*,*"
+                  ColumnSpacing="8"
+                  Margin="0,0,0,16">
+
+                <!-- Weapon Slot 1 -->
+                <VerticalStackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
+                    <Border Style="{StaticResource EquipSlot}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding UnequipCommand}"
+                                                  CommandParameter="{Binding WeaponSlot.Id}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="{Binding WeaponSlot.ItemName, TargetNullValue='·'}"
+                               Style="{StaticResource ItemInSlot}"
+                               VerticalOptions="Center" Margin="4" />
+                    </Border>
+                    <Label Text="Слот 1" Style="{StaticResource SlotHint}" />
+                </VerticalStackLayout>
+
+                <!-- Weapon Slot 2 (пустой — доп. оружие, расширение) -->
+                <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                    <Border Style="{StaticResource EquipSlot}">
+                        <Label Text="·" Style="{StaticResource ItemInSlot}" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="Слот 2" Style="{StaticResource SlotHint}" />
+                </VerticalStackLayout>
+
+                <!-- Weapon Slot 3 (пустой) -->
+                <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
+                    <Border Style="{StaticResource EquipSlot}">
+                        <Label Text="·" Style="{StaticResource ItemInSlot}" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="Слот 3" Style="{StaticResource SlotHint}" />
+                </VerticalStackLayout>
+
+            </Grid>
+
+            <!-- ══════════════════════════════════════════════════
+                 БЛОК 3: Инвентарь 32 ячейки (8 колонок × 4 ряда)
+                 ══════════════════════════════════════════════════ -->
+            <CollectionView Grid.Row="2"
+                            ItemsSource="{Binding InventorySlots}"
+                            SelectionMode="None"
+                            HorizontalOptions="Fill">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="inv:InventorySlot">
+                        <Border Style="{StaticResource InvCell}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EquipCommand}"
-                                    CommandParameter="{Binding Id}"
-                                    Style="{StaticResource PrimaryButton}"
-                                    FontSize="12" Padding="10,6" />
-                            <Button Text="Снять"
-                                    IsVisible="{Binding IsEquipped}"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UnequipCommand}"
-                                    CommandParameter="{Binding Id}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    FontSize="12" Padding="10,6" />
-                        </VerticalStackLayout>
+                                    CommandParameter="{Binding Item.Id}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="2" Padding="4">
+                                <Label Text="{Binding Item.ItemName}"
+                                       Style="{StaticResource ItemInSlot}"
+                                       IsVisible="{Binding HasItem}" />
+                                <Label Text="{Binding Item.Rarity}"
+                                       FontSize="8"
+                                       TextColor="#D4AF37"
+                                       HorizontalOptions="Center"
+                                       IsVisible="{Binding HasItem}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-                    </Grid>
-                </Frame>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+        </Grid>
+    </ScrollView>
 </ContentPage>

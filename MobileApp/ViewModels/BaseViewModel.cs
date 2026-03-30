@@ -11,7 +11,24 @@ public abstract class BaseViewModel : INotifyPropertyChanged
     public bool IsBusy
     {
         get => _isBusy;
-        set => SetProperty(ref _isBusy, value);
+        set
+        {
+            if (SetProperty(ref _isBusy, value))
+                NotifyCommandsCanExecuteChanged(); // ← при каждом изменении IsBusy
+        }
+    }
+    
+    // Список команд, которые зависят от IsBusy
+    private readonly List<Command> _trackedCommands = [];
+
+    // Регистрируем команду — вызывай в конструкторе дочернего VM
+    protected void Track(params Command[] commands)
+        => _trackedCommands.AddRange(commands);
+    
+    protected void NotifyCommandsCanExecuteChanged()
+    {
+        foreach (var cmd in _trackedCommands)
+            cmd.ChangeCanExecute();
     }
 
     private string _errorMessage = string.Empty;

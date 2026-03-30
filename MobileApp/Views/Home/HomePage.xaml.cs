@@ -15,6 +15,7 @@ public partial class HomePage : ContentPage
 
     protected override async void OnAppearing()
     {
+        Console.WriteLine($"OnAppearing() in HomePage");
         base.OnAppearing();
         await _vm.LoadAsync();
     }

@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage
+    x:Class="MobileApp.Views.Home.BlockedPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:MobileApp.ViewModels.Home"
-    x:Class="MobileApp.Views.Home.BlockedPage"
     Shell.NavBarIsVisible="False">
+
+    <!-- Градиент как на остальных страницах -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <VerticalStackLayout
         VerticalOptions="Center"
@@ -19,19 +28,20 @@
             Style="{StaticResource TitleLabel}"
             HorizontalOptions="Center" />
 
-        <!-- Временная блокировка -->
         <Label
             Text="{Binding BlockedUntilText}"
             Style="{StaticResource BodyLabel}"
             HorizontalOptions="Center"
             HorizontalTextAlignment="Center" />
 
+        <!-- Primary: фиолетовая, текст белый -->
         <Button
             Text="Написать в поддержку"
             Style="{StaticResource PrimaryButton}"
             Margin="0,16,0,0"
             Command="{Binding GoToSupportCommand}" />
 
+        <!-- Secondary: белая, текст фиолетовый -->
         <Button
             Text="Выйти из аккаунта"
             Style="{StaticResource SecondaryButton}"

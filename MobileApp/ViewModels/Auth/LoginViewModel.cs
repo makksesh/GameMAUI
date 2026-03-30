@@ -40,6 +40,7 @@ public class LoginViewModel : BaseViewModel
 
     private async Task LoginAsync()
     {
+        Console.WriteLine("LOGIN: start");
         if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
         {
             ErrorMessage = "Введите логин и пароль";
@@ -53,15 +54,21 @@ public class LoginViewModel : BaseViewModel
                 Username = Username,
                 Password = Password
             });
-
+            Console.WriteLine($"LOGIN: after api, result null = {result is null}");
             if (result is null)
             {
                 ErrorMessage = "Неверный логин или пароль";
                 return;
             }
-
+            Console.WriteLine("LOGIN: before save session");
             await _session.SaveAsync(result);
-            await Shell.Current.GoToAsync("//HomePage");
+            Console.WriteLine("LOGIN: before navigation");
+            var route = _session.IsPlayer
+                ? "//HomePage"
+                : "//RoleStubPage";
+            await Shell.Current.GoToAsync(route);
+            Console.WriteLine("LOGIN: after navigation");
         });
+        Console.WriteLine($"LOGIN: finish, IsBusy = {IsBusy}, Error = {ErrorMessage}");
     }
 }

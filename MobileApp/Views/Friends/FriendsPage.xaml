@@ -4,7 +4,19 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Друзья">
-
+    
+    <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
+    <Grid.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <!-- 20% → #0D2231 -->
+            <GradientStop Color="#0D2231" Offset="0.20" />
+            <!-- 50% → #64226A -->
+            <GradientStop Color="#64226A" Offset="0.50" />
+            <!-- 100% → #144161 -->
+            <GradientStop Color="#144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </Grid.Background>
+    
     <ScrollView>
         <VerticalStackLayout Spacing="12" Padding="16,8">
 

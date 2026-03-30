@@ -23,7 +23,7 @@ public class CharacterViewModel : BaseViewModel
     public bool HasCharacter => Character is not null;
 
     // ══════════════════════════════════
-    // Все предметы инвентаря
+    // Все предметы инвентаря (внутренний список)
     // ══════════════════════════════════
     private ObservableCollection<InventoryItemDto> _allItems = [];
     public ObservableCollection<InventoryItemDto> AllItems
@@ -32,9 +32,21 @@ public class CharacterViewModel : BaseViewModel
         set
         {
             SetProperty(ref _allItems, value);
-            NotifyEquipmentSlots();
+            RefreshAll();
         }
     }
+
+    // ══════════════════════════════════
+    // 32 ячейки инвентаря (только НЕ экипированные + пустые заглушки)
+    // ══════════════════════════════════
+    private ObservableCollection<InventoryItemDto> _inventorySlots = [];
+    public ObservableCollection<InventoryItemDto> InventorySlots
+    {
+        get => _inventorySlots;
+        private set => SetProperty(ref _inventorySlots, value);
+    }
+
+    private const int InventorySize = 32;
 
     // ══════════════════════════════════
     // Слоты оружия (макс. 3)
@@ -88,13 +100,9 @@ public class CharacterViewModel : BaseViewModel
         {
             Character = await _characterApi.GetMyAsync();
             var items = (await _inventoryApi.GetMyAsync()) ?? [];
-            // Временный дебаг
-            Console.WriteLine($"[DEBUG] Загружено предметов: {items.Count}");
-            foreach (var item in items)
-                Console.WriteLine($"[DEBUG] {item.ItemName} | {item.ItemType} | Equipped: {item.IsEquipped}");
-            AllItems = new ObservableCollection<InventoryItemDto>(items);
+            _allItems = new ObservableCollection<InventoryItemDto>(items);
+            RefreshAll();
             OnPropertyChanged(nameof(HasCharacter));
-            
         });
     }
 
@@ -102,27 +110,44 @@ public class CharacterViewModel : BaseViewModel
     {
         var name = await Shell.Current.DisplayPromptAsync(
             "Создать персонажа", "Введите имя персонажа");
-
         if (string.IsNullOrWhiteSpace(name)) return;
 
         await RunSafeAsync(async () =>
         {
-            Character = await _characterApi.CreateAsync(
-                new CreateCharacterRequest { Name = name });
+            Character = await _characterApi.CreateAsync(new CreateCharacterRequest { Name = name });
             OnPropertyChanged(nameof(HasCharacter));
         });
     }
+    
+    // ══════════════════════════════════
+    // Типы, которые можно экипировать
+    // ══════════════════════════════════
+    private static readonly HashSet<string> EquippableTypes =
+    [
+        nameof(ItemType.Weapon),
+        nameof(ItemType.Armor),
+        nameof(ItemType.Helmet),
+        nameof(ItemType.Boots),
+        nameof(ItemType.Ring)
+    ];
 
     private async Task EquipAsync(Guid id)
     {
         if (id == Guid.Empty) return;
+
+        var item = _allItems.FirstOrDefault(i => i.Id == id);
+        if (item is null) return;
+
+        if (!EquippableTypes.Contains(item.ItemType))
+            return; // Potion / Material / QuestItem — тихо игнорируем
+
         await RunSafeAsync(async () =>
         {
             var updated = await _inventoryApi.EquipAsync(id);
             if (updated is null) return;
-            var index = AllItems.IndexOf(AllItems.First(i => i.Id == id));
-            AllItems[index] = updated;
-            NotifyEquipmentSlots();
+            var index = _allItems.IndexOf(_allItems.First(i => i.Id == id));
+            _allItems[index] = updated;
+            RefreshAll();
         });
     }
 
@@ -133,35 +158,59 @@ public class CharacterViewModel : BaseViewModel
         {
             var updated = await _inventoryApi.UnequipAsync(id);
             if (updated is null) return;
-            var index = AllItems.IndexOf(AllItems.First(i => i.Id == id));
-            AllItems[index] = updated;
-            NotifyEquipmentSlots();
+            var index = _allItems.IndexOf(_allItems.First(i => i.Id == id));
+            _allItems[index] = updated;
+            RefreshAll();
         });
+    }
+
+    // ══════════════════════════════════
+    // Обновление всех слотов и инвентаря
+    // ══════════════════════════════════
+    private void RefreshAll()
+    {
+        NotifyEquipmentSlots();
+        RebuildInventorySlots();
+        OnPropertyChanged(nameof(AllItems));
+    }
+
+    /// <summary>
+    /// Собирает 32 ячейки: сначала неэкипированные предметы, потом пустые заглушки.
+    /// Экипированные предметы сюда НЕ попадают — они отображаются только в слотах снаряжения.
+    /// </summary>
+    private void RebuildInventorySlots()
+    {
+        var unequipped = _allItems
+            .Where(i => !i.IsEquipped)
+            .ToList();
+
+        var slots = new List<InventoryItemDto>(InventorySize);
+        slots.AddRange(unequipped);
+
+        // Добиваем пустыми заглушками до 32
+        while (slots.Count < InventorySize)
+            slots.Add(EmptySlot(""));
+
+        InventorySlots = new ObservableCollection<InventoryItemDto>(slots);
     }
 
     // ══════════════════════════════════
     // Хелперы слотов
     // ══════════════════════════════════
-
-    /// <summary>Возвращает n-й надетый предмет нужного типа или пустую заглушку.</summary>
     private InventoryItemDto GetSlot(string type, int index)
     {
         var equipped = _allItems
             .Where(i => i.ItemType == type && i.IsEquipped)
             .ToList();
-
-        return index < equipped.Count
-            ? equipped[index]
-            : EmptySlot(type);
+        return index < equipped.Count ? equipped[index] : EmptySlot(type);
     }
 
-    /// <summary>Первый надетый предмет нужного типа или пустая заглушка.</summary>
     private InventoryItemDto GetSlotOrEmpty(string type) =>
         _allItems.FirstOrDefault(i => i.ItemType == type && i.IsEquipped)
         ?? EmptySlot(type);
 
     private static InventoryItemDto EmptySlot(string type) =>
-        new() { Id = Guid.Empty, ItemName = string.Empty, ItemType = type };
+        new() { Id = Guid.Empty, ItemName = string.Empty, ItemType = type, IsEmpty = true };
 
     private void NotifyEquipmentSlots()
     {

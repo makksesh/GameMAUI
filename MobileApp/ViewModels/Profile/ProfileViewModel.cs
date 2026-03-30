@@ -35,17 +35,14 @@ public class ProfileViewModel : BaseViewModel
         {
             if (SetProperty(ref _selectedStorage, value))
             {
-                OnPropertyChanged(nameof(LocalButtonColor));
-                OnPropertyChanged(nameof(CloudButtonColor));
+                OnPropertyChanged(nameof(LocalButtonOpacity));
+                OnPropertyChanged(nameof(CloudButtonOpacity));
             }
         }
     }
 
-    private static readonly Color ActiveColor  = Color.FromArgb("#E8873E"); // ColorAccent
-    private static readonly Color InactiveColor = Color.FromArgb("#6B4226"); // потемнее
-
-    public Color LocalButtonColor => SelectedStorage == "Local"  ? ActiveColor : InactiveColor;
-    public Color CloudButtonColor  => SelectedStorage == "Cloud" ? ActiveColor : InactiveColor;
+    public double LocalButtonOpacity => SelectedStorage == "Local" ? 1.0 : 0.5;
+    public double CloudButtonOpacity => SelectedStorage == "Cloud" ? 1.0 : 0.5;
 
     // ── Уведомления (пока декоративные) ──────────────────────────────────
     private bool _notificationsEnabled = true;

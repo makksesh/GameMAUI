@@ -59,15 +59,15 @@ public class HomeViewModel : BaseViewModel
         GoToInventoryCommand = new Command(async () => await Shell.Current.GoToAsync("CharacterPage"));
         GoToProfileCommand   = new Command(async () => await Shell.Current.GoToAsync("ProfilePage"));
         GoToFriendsCommand   = new Command(async () => await Shell.Current.GoToAsync("FriendsPage"));
-        // ── В конструкторе добавь инициализацию ───────────────────────
-        StartAloneCommand = new Command(() =>
+
+        StartAloneCommand = new Command(async () =>
         {
-            // TODO: логика одиночного режима
+            await Shell.Current.DisplayAlert("Режим", "Одиночный режим", "OK");
         });
 
-        StartCoopCommand = new Command(() =>
+        StartCoopCommand = new Command(async () =>
         {
-            // TODO: логика кооперативного режима
+            await Shell.Current.DisplayAlert("Режим", "Кооператив", "OK");
         });
         DismissNotificationCommand = new Command(() => HasFriendRequest = false);
     }
@@ -77,11 +77,14 @@ public class HomeViewModel : BaseViewModel
         await RunSafeAsync(async () =>
         {
             // Загружаем баланс персонажа
+            Console.WriteLine("HOME: before GetMyAsync");
             var character = await _characterApi.GetMyAsync();
             Balance = character?.Balance ?? 0;
-
+            Console.WriteLine($"HOME: after GetMyAsync, null = {character is null}");
             // Проверяем входящие запросы в друзья
+            Console.WriteLine("HOME: before GetIncomingRequestsAsync");
             var requests = await _friendsApi.GetIncomingRequestsAsync();
+            Console.WriteLine($"HOME: after GetIncomingRequestsAsync, count = {requests?.Count ?? 0}");
             var pending  = requests?.FirstOrDefault(r => r.Status == "Pending");
 
             if (pending is not null)
@@ -94,5 +97,6 @@ public class HomeViewModel : BaseViewModel
                 HasFriendRequest = false;
             }
         });
+        Console.WriteLine($"HOME: LoadAsync finish, IsBusy = {IsBusy}, Error = {ErrorMessage}");
     }
 }
