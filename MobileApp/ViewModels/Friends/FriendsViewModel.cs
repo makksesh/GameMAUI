@@ -8,57 +8,61 @@ public class FriendsViewModel : BaseViewModel
 {
     private readonly IFriendsApiClient _friendsApi;
 
-    public List<FriendshipDto> Friends { get => _friends; set => SetProperty(ref _friends, value); }
     private List<FriendshipDto> _friends = [];
+    public List<FriendshipDto> Friends
+    {
+        get => _friends;
+        set => SetProperty(ref _friends, value);
+    }
 
-    public Command LoadCommand { get; }
-    public Command SendRequestCommand { get; }
-    public Command<Guid> AcceptCommand { get; }
-    public Command<Guid> DeclineCommand { get; }
+    private List<FriendRequestDto> _incomingRequests = [];
+    public List<FriendRequestDto> IncomingRequests
+    {
+        get => _incomingRequests;
+        set => SetProperty(ref _incomingRequests, value);
+    }
+
+    public bool HasFriends          => Friends.Count > 0;
+    public bool HasIncomingRequests => IncomingRequests.Count > 0;
+
+    public Command LoadCommand              { get; }
+    public Command SendRequestCommand       { get; }
+    public Command<Guid> AcceptCommand      { get; }
+    public Command<Guid> DeclineCommand     { get; }
+    public Command<Guid> RemoveFriendCommand { get; }
 
     public FriendsViewModel(IFriendsApiClient friendsApi)
     {
         _friendsApi = friendsApi;
 
-        LoadCommand       = new Command(async () => await LoadAsync());
+        LoadCommand        = new Command(async () => await LoadAsync());
         SendRequestCommand = new Command(async () => await SendRequestAsync());
-        AcceptCommand     = new Command<Guid>(async id => await AcceptAsync(id));
-        DeclineCommand    = new Command<Guid>(async id => await DeclineAsync(id));
+        AcceptCommand      = new Command<Guid>(async id => await AcceptAsync(id));
+        DeclineCommand     = new Command<Guid>(async id => await DeclineAsync(id));
+        RemoveFriendCommand = new Command<Guid>(async id => await RemoveFriendAsync(id));
     }
 
     public async Task LoadAsync()
     {
         await RunSafeAsync(async () =>
         {
-            var result = await _friendsApi.GetFriendsAsync();
-            Console.WriteLine($"Friends count = {result?.Count ?? 0}");
-            Friends = result ?? [];
+            Friends          = (await _friendsApi.GetFriendsAsync()) ?? [];
             IncomingRequests = (await _friendsApi.GetIncomingRequestsAsync()) ?? [];
+            OnPropertyChanged(nameof(HasFriends));
+            OnPropertyChanged(nameof(HasIncomingRequests));
         });
-
-        Console.WriteLine($"Error = {ErrorMessage}");
     }
-    
-    public List<FriendRequestDto> IncomingRequests
-    {
-        get => _incomingRequests;
-        set => SetProperty(ref _incomingRequests, value);
-    }
-    private List<FriendRequestDto> _incomingRequests = [];
-
 
     private async Task SendRequestAsync()
     {
         var input = await Shell.Current.DisplayPromptAsync(
             "Добавить друга", "Введите никнейм пользователя");
-
-        if (string.IsNullOrEmpty(input)) return;
-        var receiverId = input;
+        if (string.IsNullOrWhiteSpace(input)) return;
 
         await RunSafeAsync(async () =>
         {
-            await _friendsApi.SendRequestAsync(receiverId);
-            await Shell.Current.DisplayAlert("Отправлено", "Запрос в друзья отправлен", "OK");
+            await _friendsApi.SendRequestAsync(input.Trim());
+            await Shell.Current.DisplayAlert("Отправлено", $"Запрос отправлен игроку «{input}»", "OK");
         });
     }
 
@@ -67,7 +71,7 @@ public class FriendsViewModel : BaseViewModel
         await RunSafeAsync(async () =>
         {
             await _friendsApi.AcceptRequestAsync(requestId);
-            await LoadAsync();
+            await LoadAsync(); 
         });
     }
 
@@ -76,6 +80,22 @@ public class FriendsViewModel : BaseViewModel
         await RunSafeAsync(async () =>
         {
             await _friendsApi.DeclineRequestAsync(requestId);
+            await LoadAsync(); 
+        });
+    }
+
+    private async Task RemoveFriendAsync(Guid friendUserId)
+    {
+        bool confirm = await Shell.Current.DisplayAlert(
+            "Удалить друга?",
+            "Вы уверены? Дружба будет удалена с обеих сторон.",
+            "Удалить", "Отмена");
+        if (!confirm) return;
+
+        await RunSafeAsync(async () =>
+        {
+            await _friendsApi.RemoveFriendAsync(friendUserId);
+            await LoadAsync();
         });
     }
 }

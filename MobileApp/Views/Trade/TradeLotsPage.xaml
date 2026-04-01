@@ -3,100 +3,211 @@
     x:Class="MobileApp.Views.Trade.TradeLotsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Торговля">
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Trade"
+    xmlns:dto="clr-namespace:MobileApp.Models"
+    xmlns:trade="clr-namespace:MobileApp.Models.Trade"
+    x:DataType="vm:TradeViewModel">
 
-    <Grid RowDefinitions="Auto,*">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
-        <!-- Кнопка создать лот -->
-        <Button Grid.Row="0"
-                Text="+ Выставить лот"
-                Command="{Binding GoToCreateLotCommand}"
-                Style="{StaticResource PrimaryButton}"
-                Margin="16,8" />
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="16,48,16,0">
 
-        <!-- Список лотов -->
-        <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding Lots}"
-                        Margin="16,0">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame BackgroundColor="#3D2416"
-                           BorderColor="{StaticResource ColorBorder}"
-                           CornerRadius="10"
-                           Margin="0,4" Padding="14">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <HorizontalStackLayout Spacing="8">
-                                    <Label Text="{Binding ItemName}"
-                                           TextColor="{StaticResource ColorTextPrimary}"
-                                           FontAttributes="Bold" FontSize="16" />
-                                    <Label Text="{Binding ItemRarity}"
-                                           TextColor="{StaticResource ColorCurrency}"
-                                           FontSize="11"
-                                           BackgroundColor="#2C1810"
-                                           Padding="4,2" />
-                                </HorizontalStackLayout>
-                                <Label>
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Кол-во: " TextColor="{StaticResource ColorSecondary}" FontSize="12" />
-                                            <Span Text="{Binding Quantity}" TextColor="{StaticResource ColorTextPrimary}" FontSize="12" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                                <Label>
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="Цена: " TextColor="{StaticResource ColorSecondary}" FontSize="14" />
-                                            <Span Text="{Binding Price, StringFormat='{0:F2} G'}"
-                                                  TextColor="{StaticResource ColorCurrency}"
-                                                  FontAttributes="Bold" FontSize="14" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                            </VerticalStackLayout>
+        <!-- ══ Строка 0: Заголовок + кнопка "Выставить лот" ══ -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <Label Grid.Column="0"
+                   Text="Торговля"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="+ Лот"
+                    Command="{Binding GoToCreateLotCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    FontSize="13"
+                    Padding="12,6" />
+        </Grid>
 
-                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+        <!-- ══ Строка 1: Баланс игрока ══ -->
+        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,0,0,14">
+            <Image Source="icon_coin.png" WidthRequest="26" HeightRequest="26" VerticalOptions="Center" />
+            <Label Text="{Binding Balance, StringFormat='{0:F0} G'}"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource ColorCurrency}"
+                   VerticalOptions="Center" />
+        </HorizontalStackLayout>
 
-                                <!-- Кнопка для чужих лотов -->
-                                <Button
-                                    Text="Купить"
+        <!-- ══ Строка 2: Поиск + кнопка фильтров ══ -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,0,0,8">
+
+            <!-- Поле поиска -->
+            <Border Grid.Column="0"
+                    BackgroundColor="#40FFFFFF"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,0">
+                <Entry Placeholder="Поиск по названию..."
+                       PlaceholderColor="#80FFFFFF"
+                       TextColor="White"
+                       Text="{Binding SearchText}"
+                       ReturnType="Search"
+                       BackgroundColor="Transparent"
+                       FontSize="14" />
+            </Border>
+
+            <!-- Кнопка фильтров -->
+            <Border Grid.Column="1"
+                    BackgroundColor="#40FFFFFF"
+                    Stroke="{StaticResource ColorBorder}"
+                    StrokeThickness="1.5"
+                    StrokeShape="RoundRectangle 12"
+                    WidthRequest="46"
+                    HeightRequest="46"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ShowFiltersCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="icon_filter.png"
+                       WidthRequest="22" HeightRequest="22"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+        </Grid>
+
+        <!-- ══ Строка 3: Декоративный разделитель ══ -->
+        <BoxView Grid.Row="3"
+                 Color="#40FFFFFF"
+                 HeightRequest="1"
+                 Margin="0,0,0,8" />
+
+        <!-- ══ Строка 4: Список лотов + фоновый кот ══ -->
+        <Grid Grid.Row="4">
+
+            <!-- Фоновая иконка -->
+            <Image Source="icon_trade.png"
+                   WidthRequest="160"
+                   HeightRequest="160"
+                   Opacity="0.07"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+            <!-- Лоадер -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+
+            <!-- Пустой список -->
+            <Label Text="Нет активных лотов"
+                   TextColor="#60FFFFFF"
+                   FontSize="15"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}" />
+
+            <!-- Список лотов -->
+            <CollectionView ItemsSource="{Binding Lots}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="trade:TradeLotDto">
+                        <Border Margin="0,0,0,10"
+                                BackgroundColor="#30F06B6F"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeThickness="1.5"
+                                StrokeShape="RoundRectangle 16"
+                                Padding="10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.BuyCommand}"
-                                    CommandParameter="{Binding Id}"
-                                    Style="{StaticResource PrimaryButton}"
-                                    FontSize="12" Padding="12,6">
-                                    <Button.IsVisible>
-                                        <MultiBinding Converter="{StaticResource NotEqualConverter}">
-                                            <Binding Path="SellerId" />
-                                            <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}"
-                                                     Path="BindingContext.CurrentCharacterId" />
-                                        </MultiBinding>
-                                    </Button.IsVisible>
-                                </Button>
+                                    CommandParameter="{Binding Id}" />
+                            </Border.GestureRecognizers>
 
-                                <!-- Кнопка для своих лотов -->
-                                <Button
-                                    Text="Отменить"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CancelCommand}"
-                                    CommandParameter="{Binding Id}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    FontSize="12" Padding="12,6">
-                                    <Button.IsVisible>
-                                        <MultiBinding Converter="{StaticResource EqualConverter}">
-                                            <Binding Path="SellerId" />
-                                            <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}"
-                                                     Path="BindingContext.CurrentCharacterId" />
-                                        </MultiBinding>
-                                    </Button.IsVisible>
-                                </Button>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
 
-                            </VerticalStackLayout>
+                                <!-- Иконка-ячейка предмета -->
+                                <Border Grid.Column="0"
+                                        Style="{StaticResource InventorySlotBorder}"
+                                        WidthRequest="58"
+                                        HeightRequest="58"
+                                        Margin="0">
+                                    <Label Text="{Binding ItemRarity}"
+                                           FontSize="8"
+                                           TextColor="{StaticResource ColorHighlight}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalTextAlignment="Center" />
+                                </Border>
 
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                                <!-- Название + описание -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                    <Label Text="{Binding ItemName}"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource ColorTextPrimary}"
+                                           MaxLines="1"
+                                           LineBreakMode="TailTruncation" />
+                                    <Label FontSize="12"
+                                           TextColor="{StaticResource ColorSecondary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding ItemRarity}" />
+                                                <Span Text="  ×" />
+                                                <Span Text="{Binding Quantity}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!-- Кнопка отмены для своих лотов -->
+                                    <Button Text="Отменить лот"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CancelCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            FontSize="11"
+                                            Padding="8,4"
+                                            HorizontalOptions="Start">
+                                        <Button.IsVisible>
+                                            <MultiBinding Converter="{StaticResource EqualConverter}">
+                                                <Binding Path="SellerId" />
+                                                <Binding Source="{RelativeSource AncestorType={x:Type ContentPage}}"
+                                                         Path="BindingContext.CurrentCharacterId" />
+                                            </MultiBinding>
+                                        </Button.IsVisible>
+                                    </Button>
+                                </VerticalStackLayout>
+
+                                <!-- Цена справа -->
+                                <VerticalStackLayout Grid.Column="2"
+                                                     VerticalOptions="Center"
+                                                     HorizontalOptions="End"
+                                                     Spacing="2">
+                                    <Label Text="{Binding Price, StringFormat='{0:F0}'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource ColorCurrency}"
+                                           HorizontalOptions="End" />
+                                    <Image Source="icon_coin.png"
+                                           WidthRequest="20"
+                                           HeightRequest="20"
+                                           HorizontalOptions="End" />
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
 
     </Grid>
 </ContentPage>

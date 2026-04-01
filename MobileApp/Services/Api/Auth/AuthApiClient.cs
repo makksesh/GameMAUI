@@ -17,7 +17,7 @@ public class AuthApiClient : ApiClientBase, IAuthApiClient
         var response = await Http.PostAsync("auth/login", content);
 
         if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            throw new AccountBlockedException(); // ✅ специальное исключение
+            throw new AccountBlockedException(); 
 
         response.EnsureSuccessStatusCode();
 

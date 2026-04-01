@@ -5,8 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:MobileApp.ViewModels.Home"
     Shell.NavBarIsVisible="False">
-
-    <!-- Градиент как на остальных страницах -->
+    
     <ContentPage.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#B80D2231" Offset="0.20" />
@@ -33,15 +32,13 @@
             Style="{StaticResource BodyLabel}"
             HorizontalOptions="Center"
             HorizontalTextAlignment="Center" />
-
-        <!-- Primary: фиолетовая, текст белый -->
+        
         <Button
             Text="Написать в поддержку"
             Style="{StaticResource PrimaryButton}"
             Margin="0,16,0,0"
             Command="{Binding GoToSupportCommand}" />
-
-        <!-- Secondary: белая, текст фиолетовый -->
+        
         <Button
             Text="Выйти из аккаунта"
             Style="{StaticResource SecondaryButton}"

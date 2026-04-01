@@ -20,8 +20,7 @@ public abstract class ApiClientBase
         Http = factory.CreateClient("GameRpgApi");
         _tokenStorage = tokenStorage;
     }
-
-    // Добавляет Bearer-токен перед каждым защищённым запросом
+    
     protected async Task AuthorizeAsync()
     {
         var token = await _tokenStorage.GetAsync();
@@ -29,8 +28,7 @@ public abstract class ApiClientBase
             Http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
     }
-
-    // GET → T
+    
     protected async Task<T?> GetAsync<T>(string url)
     {
         await AuthorizeAsync();
@@ -39,8 +37,7 @@ public abstract class ApiClientBase
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(json, JsonOptions);
     }
-
-    // POST body → T
+    
     protected async Task<T?> PostAsync<T>(string url, object? body = null)
     {
         await AuthorizeAsync();
@@ -50,8 +47,7 @@ public abstract class ApiClientBase
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(json, JsonOptions);
     }
-
-    // POST без возвращаемого значения (204 NoContent)
+    
     protected async Task PostAsync(string url, object? body = null)
     {
         await AuthorizeAsync();
@@ -59,8 +55,7 @@ public abstract class ApiClientBase
         var response = await Http.PostAsync(url, content);
         response.EnsureSuccessStatusCode();
     }
-
-    // PATCH body → T
+    
     protected async Task<T?> PatchAsync<T>(string url, object body)
     {
         await AuthorizeAsync();
@@ -70,8 +65,7 @@ public abstract class ApiClientBase
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(json, JsonOptions);
     }
-
-    // DELETE (204 NoContent)
+    
     protected async Task DeleteAsync(string url)
     {
         await AuthorizeAsync();

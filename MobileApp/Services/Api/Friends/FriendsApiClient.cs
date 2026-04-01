@@ -23,4 +23,7 @@ public class FriendsApiClient : ApiClientBase, IFriendsApiClient
 
     public Task DeclineRequestAsync(Guid requestId) =>
         PostAsync($"friends/requests/{requestId}/decline");
+    
+    public Task RemoveFriendAsync(Guid friendUserId)
+        => DeleteAsync($"friends/{friendUserId}");
 }

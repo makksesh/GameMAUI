@@ -3,108 +3,288 @@
     x:Class="MobileApp.Views.Friends.FriendsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Friends"
+    xmlns:dto="clr-namespace:MobileApp.Models"
+    xmlns:friends="clr-namespace:MobileApp.Models.Friends"
+    x:DataType="vm:FriendsViewModel"
     Title="Друзья">
-    
-    <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
-    <Grid.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <!-- 20% → #0D2231 -->
-            <GradientStop Color="#0D2231" Offset="0.20" />
-            <!-- 50% → #64226A -->
-            <GradientStop Color="#64226A" Offset="0.50" />
-            <!-- 100% → #144161 -->
-            <GradientStop Color="#144161" Offset="1.0" />
+
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
         </LinearGradientBrush>
-    </Grid.Background>
-    
+    </ContentPage.Background>
+
     <ScrollView>
-        <VerticalStackLayout Spacing="12" Padding="16,8">
+        <VerticalStackLayout Spacing="20" Padding="16,12,16,28">
 
-            <Button Text="+ Добавить друга"
-                    Command="{Binding SendRequestCommand}"
-                    Style="{StaticResource PrimaryButton}" />
+            <!-- ══ Кнопка добавить + лоадер ══ -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="+ Добавить друга"
+                        Command="{Binding SendRequestCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        HeightRequest="46" />
+                <ActivityIndicator Grid.Column="1"
+                                   IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource ColorAccent}"
+                                   WidthRequest="36"
+                                   VerticalOptions="Center" />
+            </Grid>
 
-            <Label Text="{Binding ErrorMessage}"
-                   TextColor="Red"
-                   IsVisible="{Binding HasError}" />
+            <!-- ══ Ошибка ══ -->
+            <Border BackgroundColor="#30FF6B6B"
+                    Stroke="#FF6B6B"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,8"
+                    IsVisible="{Binding HasError}">
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#FF6B6B"
+                       FontSize="13" />
+            </Border>
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               Color="{StaticResource ColorAccent}" />
+            <!-- ══════════════════════════════════════ -->
+            <!-- ВХОДЯЩИЕ ЗАЯВКИ -->
+            <!-- ══════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="8">
 
-            <Label Text="Входящие заявки"
-                   Style="{StaticResource TitleLabel}"
-                   FontSize="18" />
+                <!-- Заголовок с бейджем -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <BoxView Grid.Column="0"
+                             Color="{StaticResource ColorAccent}"
+                             WidthRequest="4" HeightRequest="20"
+                             CornerRadius="2"
+                             VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="ВХОДЯЩИЕ ЗАЯВКИ"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource ColorSecondary}"
+                           CharacterSpacing="1.5"
+                           VerticalOptions="Center" />
+                </Grid>
 
-            <CollectionView ItemsSource="{Binding IncomingRequests}">
-                <CollectionView.EmptyView>
-                    <Label Text="Входящих заявок нет"
-                           TextColor="{StaticResource ColorSecondary}" />
-                </CollectionView.EmptyView>
+                <!-- Пусто -->
+                <Border BackgroundColor="#20FFFFFF"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14,10"
+                        IsVisible="{Binding HasIncomingRequests, Converter={StaticResource InvertBoolConverter}}">
+                    <Label Text="Новых заявок нет"
+                           TextColor="{StaticResource ColorSecondary}"
+                           FontSize="13"
+                           HorizontalOptions="Center" />
+                </Border>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame BackgroundColor="#3D2416"
-                               BorderColor="{StaticResource ColorBorder}"
-                               CornerRadius="10"
-                               Margin="0,4"
-                               Padding="14">
-                            <VerticalStackLayout Spacing="10">
-                                <Label Text="{Binding SenderUsername}"
-                                       TextColor="{StaticResource ColorTextPrimary}"
-                                       FontAttributes="Bold"
-                                       FontSize="16" />
+                <!-- Список заявок -->
+                <CollectionView ItemsSource="{Binding IncomingRequests}"
+                                IsVisible="{Binding HasIncomingRequests}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="friends:FriendRequestDto">
+                            <Border BackgroundColor="#25FFFFFF"
+                                    Stroke="{StaticResource ColorBorder}"
+                                    StrokeThickness="1.5"
+                                    StrokeShape="RoundRectangle 16"
+                                    Margin="0,0,0,8"
+                                    Padding="14">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
 
-                                <HorizontalStackLayout Spacing="10">
-                                    <Button Text="Принять"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptCommand}"
-                                            CommandParameter="{Binding Id}"
-                                            Style="{StaticResource PrimaryButton}" />
+                                    <!-- Аватар -->
+                                    <Border Grid.Column="0"
+                                            BackgroundColor="#40FFC15A"
+                                            Stroke="{StaticResource ColorBorder}"
+                                            StrokeThickness="1.5"
+                                            StrokeShape="RoundRectangle 22"
+                                            WidthRequest="44" HeightRequest="44">
+                                        <Label Text="👤"
+                                               FontSize="20"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
 
-                                    <Button Text="Отклонить"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineCommand}"
-                                            CommandParameter="{Binding Id}"
-                                            Style="{StaticResource SecondaryButton}" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                                    <!-- Имя + подпись -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding SenderUsername}"
+                                               TextColor="{StaticResource ColorTextPrimary}"
+                                               FontAttributes="Bold"
+                                               FontSize="15" />
+                                        <Label Text="Хочет добавить вас в друзья"
+                                               TextColor="{StaticResource ColorSecondary}"
+                                               FontSize="11" />
+                                    </VerticalStackLayout>
 
-            <Label Text="Список друзей"
-                   Style="{StaticResource TitleLabel}"
-                   FontSize="18"
-                   Margin="0,8,0,0" />
+                                    <!-- Принять -->
+                                    <Border Grid.Column="2"
+                                            BackgroundColor="#40A0C878"
+                                            Stroke="#A0C878"
+                                            StrokeThickness="1.5"
+                                            StrokeShape="RoundRectangle 10"
+                                            Padding="10,8"
+                                            VerticalOptions="Center">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptCommand}"
+                                                CommandParameter="{Binding Id}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="✓"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#A0C878"
+                                               HorizontalOptions="Center" />
+                                    </Border>
 
-            <CollectionView ItemsSource="{Binding Friends}">
-                <CollectionView.EmptyView>
-                    <Label Text="Друзей пока нет"
-                           TextColor="{StaticResource ColorSecondary}" />
-                </CollectionView.EmptyView>
+                                    <!-- Отклонить -->
+                                    <Border Grid.Column="3"
+                                            BackgroundColor="#40F06B6F"
+                                            Stroke="#F06B6F"
+                                            StrokeThickness="1.5"
+                                            StrokeShape="RoundRectangle 10"
+                                            Padding="10,8"
+                                            VerticalOptions="Center">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineCommand}"
+                                                CommandParameter="{Binding Id}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="✕"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#F06B6F"
+                                               HorizontalOptions="Center" />
+                                    </Border>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame BackgroundColor="#3D2416"
-                               BorderColor="{StaticResource ColorBorder}"
-                               CornerRadius="10"
-                               Margin="0,4"
-                               Padding="14">
-                            <HorizontalStackLayout Spacing="12">
-                                <Label Text="👤"
-                                       FontSize="24"
-                                       VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
 
-                                <Label Text="{Binding Username}"
-                                       TextColor="{StaticResource ColorTextPrimary}"
-                                       FontAttributes="Bold"
-                                       FontSize="16"
-                                       VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <!-- ══════════════════════════════════════ -->
+            <!-- СПИСОК ДРУЗЕЙ -->
+            <!-- ══════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="8">
+
+                <!-- Заголовок -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <BoxView Grid.Column="0"
+                             Color="#6B9FFF"
+                             WidthRequest="4" HeightRequest="20"
+                             CornerRadius="2"
+                             VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="МОИ ДРУЗЬЯ"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource ColorSecondary}"
+                           CharacterSpacing="1.5"
+                           VerticalOptions="Center" />
+                    <!-- Счётчик -->
+                    <Border Grid.Column="2"
+                            BackgroundColor="#30FFFFFF"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="8,3">
+                        <Label Text="{Binding Friends.Count}"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource ColorTextPrimary}" />
+                    </Border>
+                </Grid>
+
+                <!-- Пусто -->
+                <Border BackgroundColor="#20FFFFFF"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="14,10"
+                        IsVisible="{Binding HasFriends, Converter={StaticResource InvertBoolConverter}}">
+                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                        <Label Text="🤝"
+                               FontSize="28"
+                               HorizontalOptions="Center" />
+                        <Label Text="Список друзей пока пуст"
+                               TextColor="{StaticResource ColorSecondary}"
+                               FontSize="13"
+                               HorizontalOptions="Center" />
+                        <Label Text="Отправьте заявку, чтобы добавить друга"
+                               TextColor="{StaticResource ColorSecondary}"
+                               FontSize="11"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Список друзей -->
+                <CollectionView ItemsSource="{Binding Friends}"
+                                IsVisible="{Binding HasFriends}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="friends:FriendshipDto">
+                            <Border BackgroundColor="#25FFFFFF"
+                                    Stroke="#406B9FFF"
+                                    StrokeThickness="1.5"
+                                    StrokeShape="RoundRectangle 16"
+                                    Margin="0,0,0,8"
+                                    Padding="14">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+
+                                    <!-- Аватар -->
+                                    <Border Grid.Column="0"
+                                            BackgroundColor="#406B9FFF"
+                                            Stroke="#6B9FFF"
+                                            StrokeThickness="1.5"
+                                            StrokeShape="RoundRectangle 22"
+                                            WidthRequest="46" HeightRequest="46">
+                                        <Label Text="👤"
+                                               FontSize="22"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Имя -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="2"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding Username}"
+                                               TextColor="{StaticResource ColorTextPrimary}"
+                                               FontAttributes="Bold"
+                                               FontSize="16" />
+                                        <Label Text="В сети"
+                                               TextColor="#A0C878"
+                                               FontSize="11" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Кнопка удалить -->
+                                    <Border Grid.Column="2"
+                                            BackgroundColor="#30F06B6F"
+                                            Stroke="#80F06B6F"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 10"
+                                            Padding="10,8"
+                                            VerticalOptions="Center">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFriendCommand}"
+                                                CommandParameter="{Binding UserId}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="🗑"
+                                               FontSize="16"
+                                               HorizontalOptions="Center" />
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>

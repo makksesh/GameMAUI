@@ -3,49 +3,331 @@
     x:Class="MobileApp.Views.Character.UpgradeStatPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Улучшение статов">
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Character"
+    x:DataType="vm:UpgradeStatViewModel"
+    Title="Улучшение">
 
-    <VerticalStackLayout Padding="24" Spacing="16">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
-        <Label Text="Выберите характеристику"
-               Style="{StaticResource TitleLabel}" />
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16" Spacing="12">
 
-        <Picker Title="Стат"
-                ItemsSource="{Binding Stats}"
-                SelectedItem="{Binding SelectedStat}"
-                TextColor="{StaticResource ColorTextPrimary}"
-                BackgroundColor="#3D2416"
-                TitleColor="{StaticResource ColorSecondary}" />
+            <!-- ══ Заголовок ══ -->
+            <Label Text="Улучшение характеристик"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,8" />
 
-        <Label Text="Количество очков"
-               TextColor="{StaticResource ColorSecondary}" />
+            <!-- ══ Карточки статов ══ -->
+            <Label Text="ХАРАКТЕРИСТИКА"
+                   FontSize="11"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource ColorSecondary}"
+                   CharacterSpacing="1.5"
+                   Margin="4,0,0,4" />
 
-        <Stepper Minimum="1" Maximum="100"
-                 Value="{Binding Amount}"
-                 Increment="1" />
+            <!-- Сетка выбора стата -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                  ColumnSpacing="10" RowSpacing="10">
 
-        <Label TextColor="{StaticResource ColorTextPrimary}">
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="Улучшить на: " TextColor="{StaticResource ColorSecondary}" />
-                    <Span Text="{Binding Amount}"
-                          TextColor="{StaticResource ColorAccent}" FontAttributes="Bold" />
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+                <!-- HP -->
+                <Border Grid.Row="0" Grid.Column="0"
+                        StrokeShape="RoundRectangle 16"
+                        StrokeThickness="2"
+                        Padding="12,10">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectStatCommand}"
+                                              CommandParameter="health" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="health">
+                            <Setter Property="BackgroundColor" Value="#50FF6B6B" />
+                            <Setter Property="Stroke" Value="#FF6B6B" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="mana">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="armor">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="damage">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Image Source="icon_health.png" WidthRequest="22" HeightRequest="22"
+                               VerticalOptions="Center" />
+                        <Label Text="Здоровье"
+                               FontSize="14" FontAttributes="Bold"
+                               TextColor="#FF6B6B"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
 
-        <Button Text="Применить"
-                Command="{Binding UpgradeCommand}"
-                Style="{StaticResource PrimaryButton}" />
+                <!-- Mana -->
+                <Border Grid.Row="0" Grid.Column="1"
+                        StrokeShape="RoundRectangle 16"
+                        StrokeThickness="2"
+                        Padding="12,10">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectStatCommand}"
+                                              CommandParameter="mana" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="mana">
+                            <Setter Property="BackgroundColor" Value="#506B9FFF" />
+                            <Setter Property="Stroke" Value="#6B9FFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="health">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="armor">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="damage">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Image Source="icon_mana.png" WidthRequest="22" HeightRequest="22"
+                               VerticalOptions="Center" />
+                        <Label Text="Мана"
+                               FontSize="14" FontAttributes="Bold"
+                               TextColor="#6B9FFF"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
 
-        <ActivityIndicator IsRunning="{Binding IsBusy}"
-                           IsVisible="{Binding IsBusy}"
-                           Color="{StaticResource ColorAccent}"
-                           HorizontalOptions="Center" />
+                <!-- Armor -->
+                <Border Grid.Row="1" Grid.Column="0"
+                        StrokeShape="RoundRectangle 16"
+                        StrokeThickness="2"
+                        Padding="12,10">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectStatCommand}"
+                                              CommandParameter="armor" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="armor">
+                            <Setter Property="BackgroundColor" Value="#50F4A460" />
+                            <Setter Property="Stroke" Value="{StaticResource ColorHighlight}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="health">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="mana">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="damage">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Image Source="icon_armor.png" WidthRequest="22" HeightRequest="22"
+                               VerticalOptions="Center" />
+                        <Label Text="Защита"
+                               FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource ColorHighlight}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
 
-        <Label Text="{Binding ErrorMessage}"
-               TextColor="#FF6B6B"
-               IsVisible="{Binding HasError}" />
+                <!-- Damage -->
+                <Border Grid.Row="1" Grid.Column="1"
+                        StrokeShape="RoundRectangle 16"
+                        StrokeThickness="2"
+                        Padding="12,10">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectStatCommand}"
+                                              CommandParameter="damage" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="damage">
+                            <Setter Property="BackgroundColor" Value="#50E8873E" />
+                            <Setter Property="Stroke" Value="{StaticResource ColorAccent}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="health">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="mana">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedStat}"
+                                     Value="armor">
+                            <Setter Property="BackgroundColor" Value="#25FFFFFF" />
+                            <Setter Property="Stroke" Value="#40FFFFFF" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Image Source="icon_damage.png" WidthRequest="22" HeightRequest="22"
+                               VerticalOptions="Center" />
+                        <Label Text="Урон"
+                               FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource ColorAccent}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
 
-    </VerticalStackLayout>
+            </Grid>
+
+            <!-- ══ Блок: Количество очков ══ -->
+            <Border BackgroundColor="#25FFFFFF"
+                    Stroke="{StaticResource ColorBorder}"
+                    StrokeThickness="1.5"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16,14"
+                    Margin="0,4,0,0">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="КОЛИЧЕСТВО ОЧКОВ"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource ColorSecondary}"
+                           CharacterSpacing="1.5" />
+
+                    <Grid ColumnDefinitions="48,*,48" ColumnSpacing="8">
+
+                        <!-- Минус -->
+                        <Border Grid.Column="0"
+                                BackgroundColor="#40F06B6F"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeThickness="1.5"
+                                StrokeShape="RoundRectangle 12"
+                                HeightRequest="48">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding DecreaseCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="−" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{StaticResource ColorTextPrimary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- Значение -->
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding Amount}"
+                                   FontSize="32"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource ColorTextPrimary}"
+                                   HorizontalOptions="Center" />
+                            <Label Text="очков"
+                                   FontSize="11"
+                                   TextColor="{StaticResource ColorSecondary}"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+
+                        <!-- Плюс -->
+                        <Border Grid.Column="2"
+                                BackgroundColor="#40FFC15A"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeThickness="1.5"
+                                StrokeShape="RoundRectangle 12"
+                                HeightRequest="48">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding IncreaseCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="+" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{StaticResource ColorAccent}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Слайдер -->
+                    <Slider Minimum="1" Maximum="100"
+                            Value="{Binding AmountDouble}"
+                            ThumbColor="{StaticResource ColorAccent}"
+                            MinimumTrackColor="{StaticResource ColorAccent}"
+                            MaximumTrackColor="#40FFFFFF"
+                            Margin="0,4,0,0" />
+
+                    <Grid ColumnDefinitions="*,*">
+                        <Label Grid.Column="0" Text="1"
+                               FontSize="10" TextColor="{StaticResource ColorSecondary}" />
+                        <Label Grid.Column="1" Text="100"
+                               FontSize="10" TextColor="{StaticResource ColorSecondary}"
+                               HorizontalOptions="End" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ══ Ошибка ══ -->
+            <Border BackgroundColor="#30FF6B6B"
+                    Stroke="#FF6B6B"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,8"
+                    IsVisible="{Binding HasError}">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="⚠" FontSize="14" TextColor="#FF6B6B" VerticalOptions="Center" />
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#FF6B6B" FontSize="13"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- ══ Лоадер ══ -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center" />
+
+            <!-- ══ Кнопка применить ══ -->
+            <Button Text="⬆  Применить улучшение"
+                    Command="{Binding UpgradeCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    FontSize="15"
+                    HeightRequest="52"
+                    Margin="0,4,0,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

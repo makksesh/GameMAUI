@@ -3,88 +3,187 @@
     x:Class="MobileApp.Views.Trade.CreateTradeLotPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Выставить лот">
+    Title="Новый лот">
+
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
     <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="14">
+        <VerticalStackLayout Padding="20,16" Spacing="10">
 
-            <Label
-                Text="Новый лот"
-                Style="{StaticResource TitleLabel}"
-                HorizontalOptions="Center"
-                Margin="0,0,0,16" />
+            <!-- ══ Заголовок секции ══ -->
+            <Label Text="Выставить предмет"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource ColorTextPrimary}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,8" />
 
-            <!-- Выбор предмета из инвентаря -->
-            <Label Text="Предмет" Style="{StaticResource CaptionLabel}" />
-            <Picker
-                Title="Выберите предмет"
-                ItemsSource="{Binding InventoryItems}"
-                SelectedItem="{Binding SelectedInventoryItem}"
-                ItemDisplayBinding="{Binding ItemName}"
-                TextColor="{StaticResource ColorTextPrimary}"
-                BackgroundColor="#3D2416"
-                TitleColor="{StaticResource ColorSecondary}" />
+            <!-- ══ Блок: Выбор предмета ══ -->
+            <Border BackgroundColor="#25FFFFFF"
+                    Stroke="{StaticResource ColorBorder}"
+                    StrokeThickness="1.5"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16,12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="ПРЕДМЕТ"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource ColorSecondary}"
+                           CharacterSpacing="1.5" />
+                    <Picker Title="Выберите предмет из инвентаря"
+                            ItemsSource="{Binding InventoryItems}"
+                            SelectedItem="{Binding SelectedInventoryItem}"
+                            ItemDisplayBinding="{Binding ItemName}"
+                            TextColor="{StaticResource ColorTextPrimary}"
+                            TitleColor="#60FFFFFF"
+                            BackgroundColor="Transparent" />
+                </VerticalStackLayout>
+            </Border>
 
-            <!-- Количество -->
-            <Label Text="Количество" Style="{StaticResource CaptionLabel}" />
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <Button
-                    Grid.Column="0"
-                    Text="−"
-                    Command="{Binding DecreaseQuantityCommand}"
-                    BackgroundColor="{StaticResource ColorSurface}"
-                    TextColor="{StaticResource ColorTextPrimary}"
-                    CornerRadius="8"
-                    WidthRequest="44" />
-                <Label
-                    Grid.Column="1"
-                    Text="{Binding NewQuantity}"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    FontSize="18"
-                    FontAttributes="Bold" />
-                <Button
-                    Grid.Column="2"
-                    Text="+"
-                    Command="{Binding IncreaseQuantityCommand}"
-                    BackgroundColor="{StaticResource ColorSurface}"
-                    TextColor="{StaticResource ColorAccent}"
-                    CornerRadius="8"
-                    WidthRequest="44" />
-            </Grid>
+            <!-- ══ Блок: Количество ══ -->
+            <Border BackgroundColor="#25FFFFFF"
+                    Stroke="{StaticResource ColorBorder}"
+                    StrokeThickness="1.5"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16,12">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="КОЛИЧЕСТВО"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource ColorSecondary}"
+                           CharacterSpacing="1.5" />
+                    <Grid ColumnDefinitions="48,*,48" ColumnSpacing="8">
 
-            <!-- Цена -->
-            <Label Text="Цена (Gold)" Style="{StaticResource CaptionLabel}" />
-            <Entry
-                Placeholder="Например: 150.00"
-                Text="{Binding NewPriceText}"
-                Keyboard="Numeric"
-                ReturnType="Done" />
+                        <!-- Минус -->
+                        <Border Grid.Column="0"
+                                BackgroundColor="#40F06B6F"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeThickness="1.5"
+                                StrokeShape="RoundRectangle 12"
+                                HeightRequest="48">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding DecreaseQuantityCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="−"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource ColorTextPrimary}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
 
-            <!-- Ошибка -->
-            <Label
-                Text="{Binding ErrorMessage}"
-                TextColor="#FF6B6B"
-                IsVisible="{Binding HasError}"
-                HorizontalOptions="Center" />
+                        <!-- Значение -->
+                        <Label Grid.Column="1"
+                               Text="{Binding NewQuantity}"
+                               FontSize="26"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource ColorTextPrimary}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
 
-            <!-- Кнопки -->
-            <Button
-                Text="Выставить на продажу"
-                Command="{Binding CreateLotCommand}"
-                Style="{StaticResource PrimaryButton}"
-                Margin="0,8,0,0" />
+                        <!-- Плюс -->
+                        <Border Grid.Column="2"
+                                BackgroundColor="#40FFC15A"
+                                Stroke="{StaticResource ColorBorder}"
+                                StrokeThickness="1.5"
+                                StrokeShape="RoundRectangle 12"
+                                HeightRequest="48">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding IncreaseQuantityCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="+"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource ColorAccent}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
 
-            <ActivityIndicator
-                IsRunning="{Binding IsBusy}"
-                IsVisible="{Binding IsBusy}"
-                Color="{StaticResource ColorAccent}"
-                HorizontalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
 
-            <Button
-                Text="Отмена"
-                Command="{Binding GoBackCommand}" 
-                Style="{StaticResource SecondaryButton}" />
+            <!-- ══ Блок: Цена ══ -->
+            <Border BackgroundColor="#25FFFFFF"
+                    Stroke="{StaticResource ColorBorder}"
+                    StrokeThickness="1.5"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16,12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="ЦЕНА"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource ColorSecondary}"
+                           CharacterSpacing="1.5" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Entry Grid.Column="0"
+                               Placeholder="0"
+                               Text="{Binding NewPriceText}"
+                               Keyboard="Numeric"
+                               ReturnType="Done"
+                               TextColor="{StaticResource ColorTextPrimary}"
+                               PlaceholderColor="#60FFFFFF"
+                               BackgroundColor="Transparent"
+                               FontSize="22"
+                               FontAttributes="Bold" />
+                        <HorizontalStackLayout Grid.Column="1"
+                                               Spacing="4"
+                                               VerticalOptions="Center">
+                            <Image Source="icon_coin.png"
+                                   WidthRequest="22"
+                                   HeightRequest="22"
+                                   VerticalOptions="Center" />
+                            <Label Text="Gold"
+                                   FontSize="14"
+                                   TextColor="{StaticResource ColorCurrency}"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ══ Ошибка ══ -->
+            <Border BackgroundColor="#30FF6B6B"
+                    Stroke="#FF6B6B"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,8"
+                    IsVisible="{Binding HasError}">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="⚠" FontSize="14" TextColor="#FF6B6B" VerticalOptions="Center" />
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#FF6B6B"
+                           FontSize="13"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- ══ Лоадер ══ -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center"
+                               Margin="0,4" />
+
+            <!-- ══ Кнопки действий ══ -->
+            <Button Text="🪙  Выставить на продажу"
+                    Command="{Binding CreateLotCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    FontSize="15"
+                    HeightRequest="52"
+                    Margin="0,8,0,0" />
+
+            <Button Text="Отмена"
+                    Command="{Binding GoBackCommand}"
+                    Style="{StaticResource SecondaryButton}"
+                    FontSize="14"
+                    HeightRequest="48" />
 
         </VerticalStackLayout>
     </ScrollView>

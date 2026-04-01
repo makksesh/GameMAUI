@@ -18,8 +18,23 @@ public class UpgradeStatViewModel : BaseViewModel
     public int Amount
     {
         get => _amount;
-        set => SetProperty(ref _amount, value);
+        set => SetProperty(ref _amount, Math.Clamp(value, 1, 100));
     }
+    
+    public double AmountDouble
+    {
+        get => _amount;
+        set
+        {
+            var clamped = Math.Clamp((int)Math.Round(value), 1, 100);
+            if (_amount == clamped) return;
+            _amount = clamped;
+            OnPropertyChanged(nameof(Amount));
+            OnPropertyChanged(nameof(AmountDouble));
+        }
+    }
+    
+    
 
     private CharacterDto? _updated;
     public CharacterDto? Updated
@@ -31,11 +46,18 @@ public class UpgradeStatViewModel : BaseViewModel
     public List<string> Stats { get; } = ["health", "mana", "armor", "damage"];
 
     public Command UpgradeCommand { get; }
+    public Command<string> SelectStatCommand { get; }
+    public Command IncreaseCommand    { get; }
+    public Command DecreaseCommand    { get; }
 
     public UpgradeStatViewModel(ICharacterApiClient characterApi)
     {
         _characterApi = characterApi;
-        UpgradeCommand = new Command(async () => await UpgradeAsync(), () => !IsBusy);
+
+        UpgradeCommand     = new Command(async () => await UpgradeAsync(), () => !IsBusy);
+        SelectStatCommand  = new Command<string>(stat => SelectedStat = stat);
+        IncreaseCommand    = new Command(() => Amount++);
+        DecreaseCommand = new Command(() => { if (Amount > 1) Amount--; });
     }
 
     private async Task UpgradeAsync()
@@ -47,7 +69,11 @@ public class UpgradeStatViewModel : BaseViewModel
                 Stat   = SelectedStat,
                 Amount = Amount
             });
-            await Shell.Current.DisplayAlert("Успех", $"{SelectedStat} улучшен!", "OK");
+            await Shell.Current.DisplayAlert(
+                "Успех ✨",
+                $"{SelectedStat} улучшен на {Amount} очков!",
+                "OK");
+            await Shell.Current.GoToAsync("..");
         });
     }
 }

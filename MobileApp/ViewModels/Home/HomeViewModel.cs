@@ -76,15 +76,9 @@ public class HomeViewModel : BaseViewModel
     {
         await RunSafeAsync(async () =>
         {
-            // Загружаем баланс персонажа
-            Console.WriteLine("HOME: before GetMyAsync");
             var character = await _characterApi.GetMyAsync();
             Balance = character?.Balance ?? 0;
-            Console.WriteLine($"HOME: after GetMyAsync, null = {character is null}");
-            // Проверяем входящие запросы в друзья
-            Console.WriteLine("HOME: before GetIncomingRequestsAsync");
             var requests = await _friendsApi.GetIncomingRequestsAsync();
-            Console.WriteLine($"HOME: after GetIncomingRequestsAsync, count = {requests?.Count ?? 0}");
             var pending  = requests?.FirstOrDefault(r => r.Status == "Pending");
 
             if (pending is not null)

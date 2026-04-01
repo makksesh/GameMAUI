@@ -9,17 +9,18 @@ namespace MobileApp.Views.Trade;
 
 public partial class TradeLotsPage : ContentPage
 {
-    private readonly TradeViewModel _viewModel;
+    private readonly TradeViewModel _vm;
 
-    public TradeLotsPage(TradeViewModel viewModel)
+    public TradeLotsPage(TradeViewModel vm)
     {
         InitializeComponent();
-        BindingContext = _viewModel = viewModel;
+        _vm = vm;
+        BindingContext = vm;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadAsync();
+        await _vm.LoadAsync();
     }
 }

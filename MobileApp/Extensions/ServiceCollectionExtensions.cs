@@ -1,3 +1,4 @@
+using MobileApp.Constants;
 using MobileApp.Services.Api.Auth;
 using MobileApp.Services.Api.Character;
 using MobileApp.Services.Api.Friends;
@@ -29,22 +30,23 @@ namespace MobileApp.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddHttpClients(this IServiceCollection services)
-    {
-        services.AddHttpClient("GameRpgApi", client =>
-        {
-#if __IOS__
-            client.BaseAddress = new Uri("https://localhost:7001/api/");
-#elif __ANDROID__
-            client.BaseAddress = new Uri("http://10.0.2.2:7001/api/");
-#else
-            client.BaseAddress = new Uri("http://localhost:7001/api/");
-#endif
-            client.Timeout = TimeSpan.FromSeconds(5);
-        });
+   public static IServiceCollection AddHttpClients(this IServiceCollection services)
+   {
+       services.AddHttpClient("GameRpgApi", client =>
+       {
+   #if __IOS__
+           client.BaseAddress = new Uri(ApiEndpoints.IosLocalNetwork);
+   #elif __ANDROID__
+           client.BaseAddress = new Uri(ApiEndpoints.AndroidEmulator);
+   #else
+           client.BaseAddress = new Uri(ApiEndpoints.DesktopLocal);
+   #endif
+           client.Timeout = TimeSpan.FromSeconds(5);
+       });
+   
+       return services;
+   }
 
-        return services;
-    }
 
     public static IServiceCollection AddStorage(this IServiceCollection services)
     {

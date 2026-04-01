@@ -69,8 +69,7 @@ public class SupportViewModel : BaseViewModel
                 Message = NewMessage
             });
             if (ticket is null) return;
-
-            // Сразу отправляем описание как первое сообщение в чат
+            
             await _supportApi.SendMessageAsync(ticket.Id, new SendMessageRequest
             {
                 Text = NewMessage

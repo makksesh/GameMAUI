@@ -45,19 +45,6 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid Padding="4,3">
-
-                        <!--
-                            IsFromModerator=true  → сообщение модератора → слева (Start)
-                            IsFromModerator=false → сообщение игрока    → справа (End)
-                            
-                            BoolToLayoutOptionsConverter:
-                              true  → LayoutOptions.End
-                              false → LayoutOptions.Start
-                            
-                            Нам нужна инверсия: игрок (false) → End, модератор (true) → Start
-                            Поэтому используем IsFromModerator НЕ через конвертер,
-                            а задаём явно HorizontalOptions через Trigger.
-                        -->
                         <Border MaximumWidthRequest="270"
                                 StrokeThickness="0"
                                 Padding="12,8">
@@ -65,7 +52,6 @@
                                 <RoundRectangle CornerRadius="14" />
                             </Border.StrokeShape>
 
-                            <!-- Триггеры: игрок справа фиолетовый, модератор слева синий -->
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border"
                                              Binding="{Binding IsFromModerator}"

@@ -5,8 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Shell.NavBarIsVisible="True"
     Title="Профиль">
-
-    <!-- ═══ ГРАДИЕНТНЫЙ ФОН ═══ -->
+    
     <ContentPage.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#B80D2231" Offset="0.20" />
@@ -19,7 +18,7 @@
         
         <ResourceDictionary>
 
-            <!-- ═══ СТИЛЬ КНОПКИ "АКТИВНАЯ" (Помощь / Изменить пароль / Локально) ═══ -->
+            <!-- ═══ СТИЛЬ КНОПКИ (Помощь / Изменить пароль / Локально) ═══ -->
             <Style x:Key="GradientActiveButton" TargetType="Button">
                 <Setter Property="TextColor" Value="White" />
                 <Setter Property="CornerRadius" Value="22" />
@@ -27,7 +26,6 @@
                 <Setter Property="BorderWidth" Value="1.5" />
                 <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="Padding" Value="0,12" />
-                <!-- 3D-эффект через Shadow -->
                 <Setter Property="Shadow">
                     <Setter.Value>
                         <Shadow Brush="#BC32D2" Offset="0,4" Radius="6" Opacity="0.55" />
@@ -35,7 +33,7 @@
                 </Setter>
             </Style>
 
-            <!-- ═══ СТИЛЬ КНОПКИ "ОБЛАКО" (неактивная, 50% прозрачности) ═══ -->
+            <!-- ═══ СТИЛЬ КНОПКИ (неактивная, 50% прозрачности) ═══ -->
             <Style x:Key="GradientCloudButton" TargetType="Button"
                    BasedOn="{StaticResource GradientActiveButton}">
                 <Setter Property="Opacity" Value="0.5" />

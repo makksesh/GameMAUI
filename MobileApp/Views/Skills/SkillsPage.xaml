@@ -3,171 +3,367 @@
     x:Class="MobileApp.Views.Skills.SkillsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MobileApp.ViewModels.Skills"
+    xmlns:dto="clr-namespace:MobileApp.Models"
+    xmlns:skills="clr-namespace:MobileApp.Models.Skills"
+    x:DataType="vm:SkillsViewModel"
     Title="Навыки">
 
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#B80D2231" Offset="0.20" />
+            <GradientStop Color="#B864226A" Offset="0.50" />
+            <GradientStop Color="#B8144161" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <ContentPage.Resources>
+        <!-- Иконки навыков по типу -->
+        <Style x:Key="SkillIconBorder" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="#40FFC15A" />
+            <Setter Property="Stroke" Value="{StaticResource ColorBorder}" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+            <Setter Property="WidthRequest" Value="52" />
+            <Setter Property="HeightRequest" Value="52" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="LearnedSkillIconBorder" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="#40A0C878" />
+            <Setter Property="Stroke" Value="#A0C878" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+            <Setter Property="WidthRequest" Value="52" />
+            <Setter Property="HeightRequest" Value="52" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="SectionHeader" TargetType="Label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="{StaticResource ColorSecondary}" />
+            <Setter Property="CharacterSpacing" Value="1.5" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+    </ContentPage.Resources>
+
     <ScrollView>
-        <VerticalStackLayout Padding="16,8,16,24" Spacing="18">
+        <VerticalStackLayout Padding="16,12,16,28" Spacing="24">
 
-            <!-- Неизученные -->
-            <VerticalStackLayout Spacing="10">
-                <Label Text="Неизученные навыки"
-                       TextColor="{StaticResource ColorTextPrimary}"
-                       FontSize="20"
-                       FontAttributes="Bold" />
+            <!-- ══ Лоадер ══ -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource ColorAccent}"
+                               HorizontalOptions="Center"
+                               Margin="0,20" />
 
-                <Label Text="Сначала навык изучается, после чего он переносится в список изученных."
-                       TextColor="{StaticResource ColorSecondary}"
-                       FontSize="12" />
-
-                <Label Text="Все навыки уже изучены"
-                       IsVisible="{Binding HasUnlearnedSkills, Converter={StaticResource InvertBoolConverter}}"
-                       TextColor="{StaticResource ColorSecondary}"
+            <!-- ══ Ошибка ══ -->
+            <Border BackgroundColor="#30FF6B6B"
+                    Stroke="#FF6B6B"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,8"
+                    IsVisible="{Binding HasError}">
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#FF6B6B"
                        FontSize="13" />
+            </Border>
 
+            <!-- ══════════════════════════════════════ -->
+            <!-- НЕИЗУЧЕННЫЕ НАВЫКИ -->
+            <!-- ══════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Заголовок секции -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,0,0,4">
+                    <BoxView Grid.Column="0"
+                             Color="{StaticResource ColorAccent}"
+                             WidthRequest="4"
+                             HeightRequest="22"
+                             CornerRadius="2"
+                             VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="ДОСТУПНЫЕ НАВЫКИ"
+                               Style="{StaticResource SectionHeader}" />
+                        <Label Text="Изучите навык за золото — он появится в вашем арсенале"
+                               TextColor="{StaticResource ColorSecondary}"
+                               FontSize="12"
+                               Margin="0,-4,0,8" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Пусто -->
+                <Border BackgroundColor="#20FFFFFF"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,12"
+                        IsVisible="{Binding HasUnlearnedSkills, Converter={StaticResource InvertBoolConverter}}">
+                    <Label Text="✨ Все доступные навыки уже изучены"
+                           TextColor="{StaticResource ColorSecondary}"
+                           FontSize="13"
+                           HorizontalOptions="Center" />
+                </Border>
+
+                <!-- Список -->
                 <CollectionView ItemsSource="{Binding UnlearnedSkills}"
                                 IsVisible="{Binding HasUnlearnedSkills}"
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Frame BackgroundColor="#3D2416"
-                                   BorderColor="{StaticResource ColorBorder}"
-                                   CornerRadius="10"
-                                   Margin="0,4"
-                                   Padding="14">
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                        <Label Text="{Binding Name}"
-                                               TextColor="{StaticResource ColorTextPrimary}"
-                                               FontAttributes="Bold"
-                                               FontSize="16" />
+                        <DataTemplate x:DataType="skills:SkillDto">
+                            <Border BackgroundColor="#25FFFFFF"
+                                    Stroke="{StaticResource ColorBorder}"
+                                    StrokeThickness="1.5"
+                                    StrokeShape="RoundRectangle 18"
+                                    Margin="0,0,0,10"
+                                    Padding="14">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+
+                                    <!-- Иконка навыка -->
+                                    <Border Grid.Column="0" Style="{StaticResource SkillIconBorder}">
+                                        <Image Source="icon_skill.png"
+                                               WidthRequest="28"
+                                               HeightRequest="28"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Информация -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding Name}"
+                                                   TextColor="{StaticResource ColorTextPrimary}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="15" />
+                                            <!-- Бейдж типа навыка -->
+                                            <Border BackgroundColor="#30FFC15A"
+                                                    Stroke="{StaticResource ColorBorder}"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Padding="6,2">
+                                                <Label Text="{Binding Type}"
+                                                       TextColor="{StaticResource ColorAccent}"
+                                                       FontSize="10" />
+                                            </Border>
+                                        </HorizontalStackLayout>
+
                                         <Label Text="{Binding Description}"
                                                TextColor="{StaticResource ColorSecondary}"
-                                               FontSize="12" />
-                                        <HorizontalStackLayout Spacing="12">
-                                            <Label TextColor="{StaticResource ColorCurrency}">
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span Text="Стоимость изучения: "
-                                                              TextColor="{StaticResource ColorSecondary}"
-                                                              FontSize="11" />
-                                                        <Span Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
-                                                              TextColor="{StaticResource ColorCurrency}"
-                                                              FontSize="11" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
-                                            <Label TextColor="{StaticResource ColorSecondary}"
-                                                   FontSize="11">
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span Text="Макс. уровень: "
-                                                              TextColor="{StaticResource ColorSecondary}"
-                                                              FontSize="11" />
-                                                        <Span Text="{Binding MaxLevel}"
-                                                              TextColor="{StaticResource ColorHighlight}"
-                                                              FontSize="11" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
+                                               FontSize="12"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation" />
+
+                                        <HorizontalStackLayout Spacing="14" Margin="0,2,0,0">
+                                            <!-- Цена -->
+                                            <HorizontalStackLayout Spacing="4">
+                                                <Image Source="icon_coin.png"
+                                                       WidthRequest="13" HeightRequest="13"
+                                                       VerticalOptions="Center" />
+                                                <Label Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
+                                                       TextColor="{StaticResource ColorCurrency}"
+                                                       FontSize="12" />
+                                            </HorizontalStackLayout>
+                                            <!-- Макс уровень -->
+                                            <HorizontalStackLayout Spacing="4">
+                                                <Label Text="Макс. ур."
+                                                       TextColor="{StaticResource ColorSecondary}"
+                                                       FontSize="11" />
+                                                <Label Text="{Binding MaxLevel}"
+                                                       TextColor="{StaticResource ColorHighlight}"
+                                                       FontSize="11"
+                                                       FontAttributes="Bold" />
+                                            </HorizontalStackLayout>
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
 
-                                    <Button Grid.Column="1"
-                                            Text="Изучить"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnCommand}"
-                                            CommandParameter="{Binding Id}"
-                                            Style="{StaticResource PrimaryButton}"
-                                            FontSize="12"
-                                            Padding="10,6"
-                                            VerticalOptions="Center" />
+                                    <!-- Кнопка изучить -->
+                                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
+                                        <Border BackgroundColor="#40E8873E"
+                                                Stroke="{StaticResource ColorAccent}"
+                                                StrokeThickness="1.5"
+                                                StrokeShape="RoundRectangle 12"
+                                                Padding="10,8">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LearnCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            </Border.GestureRecognizers>
+                                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                                <Label Text="📖"
+                                                       FontSize="18"
+                                                       HorizontalOptions="Center" />
+                                                <Label Text="Изучить"
+                                                       FontSize="10"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{StaticResource ColorAccent}"
+                                                       HorizontalOptions="Center" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </VerticalStackLayout>
+
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
             </VerticalStackLayout>
 
-            <!-- Изученные -->
-            <VerticalStackLayout Spacing="10">
-                <Label Text="Изученные навыки"
-                       TextColor="{StaticResource ColorTextPrimary}"
-                       FontSize="20"
-                       FontAttributes="Bold" />
+            <!-- ══════════════════════════════════════ -->
+            <!-- ИЗУЧЕННЫЕ НАВЫКИ -->
+            <!-- ══════════════════════════════════════ -->
+            <VerticalStackLayout Spacing="0">
 
-                <Label Text="Изученные навыки можно улучшать дальше, пока не будет достигнут максимальный уровень."
-                       TextColor="{StaticResource ColorSecondary}"
-                       FontSize="12" />
+                <!-- Заголовок секции -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,0,0,4">
+                    <BoxView Grid.Column="0"
+                             Color="#A0C878"
+                             WidthRequest="4"
+                             HeightRequest="22"
+                             CornerRadius="2"
+                             VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="МОЙ АРСЕНАЛ"
+                               Style="{StaticResource SectionHeader}"
+                               TextColor="#A0C878" />
+                        <Label Text="Прокачивайте навыки до максимального уровня"
+                               TextColor="{StaticResource ColorSecondary}"
+                               FontSize="12"
+                               Margin="0,-4,0,8" />
+                    </VerticalStackLayout>
+                </Grid>
 
-                <Label Text="У вас пока нет изученных навыков"
-                       IsVisible="{Binding HasLearnedSkills, Converter={StaticResource InvertBoolConverter}}"
-                       TextColor="{StaticResource ColorSecondary}"
-                       FontSize="13" />
+                <!-- Пусто -->
+                <Border BackgroundColor="#20FFFFFF"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 14"
+                        Padding="16,12"
+                        IsVisible="{Binding HasLearnedSkills, Converter={StaticResource InvertBoolConverter}}">
+                    <Label Text="🗡 Вы ещё не изучили ни одного навыка"
+                           TextColor="{StaticResource ColorSecondary}"
+                           FontSize="13"
+                           HorizontalOptions="Center" />
+                </Border>
 
+                <!-- Список -->
                 <CollectionView ItemsSource="{Binding MySkills}"
                                 IsVisible="{Binding HasLearnedSkills}"
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Frame BackgroundColor="#3D2416"
-                                   BorderColor="{StaticResource ColorBorder}"
-                                   CornerRadius="10"
-                                   Margin="0,4"
-                                   Padding="14">
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                        <Label Text="{Binding SkillName}"
-                                               TextColor="{StaticResource ColorTextPrimary}"
-                                               FontAttributes="Bold"
-                                               FontSize="16" />
+                        <DataTemplate x:DataType="skills:CharacterSkillDto">
+                            <Border BackgroundColor="#25FFFFFF"
+                                    Stroke="#60A0C878"
+                                    StrokeThickness="1.5"
+                                    StrokeShape="RoundRectangle 18"
+                                    Margin="0,0,0,10"
+                                    Padding="14">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+
+                                    <!-- Иконка навыка -->
+                                    <Border Grid.Column="0" Style="{StaticResource LearnedSkillIconBorder}">
+                                        <Image Source="icon_skill_learned.png"
+                                               WidthRequest="28"
+                                               HeightRequest="28"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Информация -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding SkillName}"
+                                                   TextColor="{StaticResource ColorTextPrimary}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="15" />
+                                            <!-- Бейдж типа -->
+                                            <Border BackgroundColor="#30A0C878"
+                                                    Stroke="#A0C878"
+                                                    StrokeThickness="1"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Padding="6,2">
+                                                <Label Text="{Binding Type}"
+                                                       TextColor="#A0C878"
+                                                       FontSize="10" />
+                                            </Border>
+                                        </HorizontalStackLayout>
+
                                         <Label Text="{Binding Description}"
                                                TextColor="{StaticResource ColorSecondary}"
-                                               FontSize="12" />
-                                        <Label>
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="Уровень: "
-                                                          TextColor="{StaticResource ColorSecondary}"
-                                                          FontSize="12" />
-                                                    <Span Text="{Binding CurrentLevel}"
-                                                          TextColor="{StaticResource ColorAccent}"
-                                                          FontSize="12"
-                                                          FontAttributes="Bold" />
-                                                    <Span Text=" / "
-                                                          TextColor="{StaticResource ColorSecondary}"
-                                                          FontSize="12" />
-                                                    <Span Text="{Binding MaxLevel}"
-                                                          TextColor="{StaticResource ColorSecondary}"
-                                                          FontSize="12" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Label TextColor="{StaticResource ColorCurrency}">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="Стоимость улучшения: "
-                                                          TextColor="{StaticResource ColorSecondary}"
-                                                          FontSize="11" />
-                                                    <Span Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
-                                                          TextColor="{StaticResource ColorCurrency}"
-                                                          FontSize="11" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
+                                               FontSize="12"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation" />
+
+                                        <!-- Прогресс уровня -->
+                                        <HorizontalStackLayout Spacing="6" Margin="0,2,0,0">
+                                            <Label Text="Уровень"
+                                                   TextColor="{StaticResource ColorSecondary}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center" />
+                                            <Label Text="{Binding CurrentLevel}"
+                                                   TextColor="{StaticResource ColorAccent}"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   VerticalOptions="Center" />
+                                            <Label Text="/"
+                                                   TextColor="{StaticResource ColorSecondary}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center" />
+                                            <Label Text="{Binding MaxLevel}"
+                                                   TextColor="{StaticResource ColorSecondary}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+
+                                        <!-- Прогресс-бар -->
+                                        <ProgressBar
+                                            Progress="{Binding LevelProgress}"
+                                            ProgressColor="#A0C878"
+                                            BackgroundColor="#30FFFFFF"
+                                            HeightRequest="4"
+                                            Margin="0,2,0,0" />
+
+                                        <!-- Стоимость прокачки -->
+                                        <HorizontalStackLayout Spacing="4">
+                                            <Image Source="icon_coin.png"
+                                                   WidthRequest="12" HeightRequest="12"
+                                                   VerticalOptions="Center" />
+                                            <Label Text="{Binding LevelUpCost, StringFormat='{0:F0} G'}"
+                                                   TextColor="{StaticResource ColorCurrency}"
+                                                   FontSize="11" />
+                                        </HorizontalStackLayout>
                                     </VerticalStackLayout>
 
-                                    <Button Grid.Column="1"
-                                            Text="▲ Прокачать"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LevelUpCommand}"
-                                            CommandParameter="{Binding Id}"
-                                            Style="{StaticResource SecondaryButton}"
-                                            FontSize="12"
-                                            Padding="10,6"
-                                            VerticalOptions="Center" />
+                                    <!-- Кнопка прокачать / макс -->
+                                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
+                                        <Border BackgroundColor="#40A0C878"
+                                                Stroke="#A0C878"
+                                                StrokeThickness="1.5"
+                                                StrokeShape="RoundRectangle 12"
+                                                Padding="10,8">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LevelUpCommand}"
+                                                    CommandParameter="{Binding Id}" />
+                                            </Border.GestureRecognizers>
+                                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                                <Label Text="⬆"
+                                                       FontSize="18"
+                                                       HorizontalOptions="Center" />
+                                                <Label Text="Прокачать"
+                                                       FontSize="10"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#A0C878"
+                                                       HorizontalOptions="Center" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </VerticalStackLayout>
+
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
             </VerticalStackLayout>
 
         </VerticalStackLayout>

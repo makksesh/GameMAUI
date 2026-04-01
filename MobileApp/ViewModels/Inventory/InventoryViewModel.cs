@@ -93,10 +93,8 @@ public class InventoryViewModel : BaseViewModel
     {
         await RunSafeAsync(async () =>
         {
-            // Грузим персонажа для характеристик
             Character = await _characterApi.GetMyAsync();
-
-            // Грузим все предметы инвентаря
+            
             var allItems = await _inventoryApi.GetMyAsync() ?? [];
             RebuildSlots(allItems);
         });
@@ -108,7 +106,6 @@ public class InventoryViewModel : BaseViewModel
     /// </summary>
     private void RebuildSlots(List<InventoryItemDto> allItems)
     {
-        // Сбрасываем слоты
         HelmetSlot = null;
         ArmorSlot  = null;
         BootsSlot  = null;
@@ -132,7 +129,6 @@ public class InventoryViewModel : BaseViewModel
                         else RingSlot2 = item;
                         break;
                     case "Weapon": WeaponSlot = item; break;
-                    // Prочие типы экипированных — в инвентарь не попадают
                 }
             }
             else
@@ -140,8 +136,7 @@ public class InventoryViewModel : BaseViewModel
                 unequipped.Add(item);
             }
         }
-
-        // Строим 32 ячейки: заполняем предметами, остальные — пустые
+        
         var slots = new List<InventorySlot>(InventorySize);
         for (int i = 0; i < InventorySize; i++)
         {
@@ -155,7 +150,6 @@ public class InventoryViewModel : BaseViewModel
 
     private async Task EquipAsync(Guid id)
     {
-        // Пустая ячейка передаёт Guid.Empty — игнорируем
         if (id == Guid.Empty) return;
 
         await RunSafeAsync(async () =>

@@ -123,8 +123,7 @@
 
                     <!-- ═══ КОЛОНКА 0: характеристики ═══ -->
                     <VerticalStackLayout Grid.Column="0" Spacing="6">
-
-                        <!-- Кнопка "Улучшить" -->
+                        
                         <Button Text="Улучшить"
                                 Command="{Binding GoToUpgradeCommand}"
                                 Style="{StaticResource SecondaryButton}"

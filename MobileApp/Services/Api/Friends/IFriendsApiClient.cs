@@ -10,4 +10,5 @@ public interface IFriendsApiClient
     Task<List<FriendRequestDto>?> GetIncomingRequestsAsync();
     Task AcceptRequestAsync(Guid requestId);
     Task DeclineRequestAsync(Guid requestId);
+    Task RemoveFriendAsync(Guid friendUserId);
 }
